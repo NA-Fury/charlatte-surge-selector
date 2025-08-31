@@ -28,10 +28,10 @@ jobs:
           cache-dependency-path: app/package-lock.json
       - run: npm ci
       - run: GITHUB_PAGES=1 npm run build
-      - run: cp -v dist/index.html dist/404.html   # SPA fallback
+      - run: cp -v dist/index.html dist/404.html  # SPA fallback for BrowserRouter
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: app/dist
+          path: app/dist   # path is from repo root; we point to app/dist
 
   deploy:
     needs: build
