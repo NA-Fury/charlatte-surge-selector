@@ -2,10 +2,41 @@ import { useNavigate } from 'react-router-dom';
 import { useStore } from '../lib/store';
 import { useState } from 'react';
 
+type Code = 'ASME' | 'EN' | 'CODAP' | 'AS1210' | 'PD5500';
+
+interface ContactForm {
+  name: string; email: string; phone: string; company: string; country: string; notes: string;
+  code: Code; uStamp: boolean; tpi: boolean;
+}
+
+const fieldDefs = [
+  { key: 'name', label: 'Who you are' },
+  { key: 'email', label: 'Email' },
+  { key: 'phone', label: 'Contact Number' },
+  { key: 'company', label: 'Company / Firm' },
+  { key: 'country', label: 'Country / Region' },
+] as const;
+type FieldKey = typeof fieldDefs[number]['key'];
+
 export default function Contact() {
   const nav = useNavigate();
   const { state } = useStore();
-  const [form, setForm] = useState({ name:'',email:'',phone:'',company:'',country:'',notes:'', code:'ASME', uStamp:false, tpi:false });
+
+  const [form, setForm] = useState<ContactForm>({
+    name: state.name ?? '',
+    email: state.email ?? '',
+    phone: '',
+    company: state.company ?? '',
+    country: state.country ?? '',
+    notes: state.notes ?? '',
+    code: 'ASME',
+    uStamp: false,
+    tpi: false,
+  });
+
+  function setField<K extends FieldKey>(key: K, value: string) {
+    setForm(f => ({ ...f, [key]: value }));
+  }
 
   function submit() {
     console.log('Lead submission:', { selection: state, contact: form });
@@ -18,26 +49,32 @@ export default function Contact() {
       <h1 className="text-2xl font-semibold">Contact & Quote</h1>
 
       <div className="grid md:grid-cols-2 gap-4">
-        {[
-          ['name','Who you are'],['email','Email'],['phone','Contact Number'],['company','Company / Firm'],['country','Country / Region']
-        ].map(([k,label]) => (
-          <div key={k}>
-            <label className="text-sm text-slate-600">{label}</label>
-            <input value={(form as any)[k]} onChange={e=>setForm(f=>({ ...f, [k]: e.target.value }))}
-              className="mt-1 w-full border rounded-lg p-2" />
+        {fieldDefs.map(def => (
+          <div key={def.key}>
+            <label className="text-sm text-slate-600">{def.label}</label>
+            <input
+              value={form[def.key]}
+              onChange={(e) => setField(def.key, e.target.value)}
+              className="mt-1 w-full border rounded-lg p-2"
+            />
           </div>
         ))}
         <div className="md:col-span-2">
           <label className="text-sm text-slate-600">More details / Questions</label>
-          <textarea value={form.notes} onChange={e=>setForm(f=>({ ...f, notes: e.target.value }))}
-            className="mt-1 w-full border rounded-lg p-2 min-h-[120px]" />
+          <textarea
+            value={form.notes}
+            onChange={e=>setForm(f=>({ ...f, notes: e.target.value }))}
+            className="mt-1 w-full border rounded-lg p-2 min-h-[120px]"
+          />
         </div>
       </div>
 
       <div className="grid md:grid-cols-3 gap-4">
         <div>
           <label className="text-sm text-slate-600">Manufacturing Code</label>
-          <select value={form.code} onChange={e=>setForm(f=>({ ...f, code: e.target.value as any }))}
+          <select
+            value={form.code}
+            onChange={e=>setForm(f=>({ ...f, code: e.target.value as Code }))}
             className="mt-1 w-full border rounded-lg p-2">
             <option value="ASME">ASME BPVC Sec VIII</option>
             <option value="EN">EN 13445</option>
