@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useState, type ReactNode, type Dispatch, type SetStateAction } from 'react';
+import { createContext, useContext, useState, type ReactNode, type Dispatch, type SetStateAction } from 'react';
 
 export type Media =
   | 'CleanWater' | 'Potable' | 'TSE' | 'NoSolids'
