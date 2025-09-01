@@ -15,6 +15,7 @@
     "@react-three/drei": "^10.7.4",
     "@react-three/fiber": "^9.3.0",
     "framer-motion": "^12.23.12",
+    "lucide-react": "^0.542.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.62.0",
@@ -46,8 +47,9 @@
     "vite": "^7.1.2"
   },
   "lint-staged": {
-  "src/**/*.{ts,tsx,css,json}": [
-    "prettier --write",
-    "eslint --fix"
-  ]}
+    "src/**/*.{ts,tsx,css,json}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  }
 }
