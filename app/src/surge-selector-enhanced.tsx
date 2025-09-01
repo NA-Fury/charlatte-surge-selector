@@ -276,7 +276,6 @@ const ApplicationStep: React.FC = () => {
           const Icon = m.icon;
           const isSelected = state.media === m.key;
           const isHovered = hoveredMedia === m.key;
-
           return (
             <button
               key={m.key}
