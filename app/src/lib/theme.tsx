@@ -1,5 +1,6 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from 'react';
-import type { ReactNode } from 'react'; // type-only (fix TS1484)
+import type { ReactNode } from 'react';
 
 interface Theme {
   // Colors
@@ -90,7 +91,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const hostTheme: Partial<Theme> = {};
     
     // Common CSS variable patterns to check
-    const varMappings = [
+    const varMappings: Array<{ cssVar: string; themeKey: keyof Theme }> = [
       { cssVar: '--color-primary', themeKey: 'primary' },
       { cssVar: '--primary-color', themeKey: 'primary' },
       { cssVar: '--brand-color', themeKey: 'primary' },
@@ -113,16 +114,17 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       { cssVar: '--divider-color', themeKey: 'borderColor' },
     ];
 
-    varMappings.forEach(({ cssVar, themeKey }) => {
+    for (const { cssVar, themeKey } of varMappings) {
       const value = computedStyle.getPropertyValue(cssVar).trim();
       if (value) {
-        (hostTheme as any)[themeKey] = value;
+        hostTheme[themeKey] = value;
       }
-    });
+    }
 
     // Check for Charlatte-specific theme
-    const isCharlatteSite = window.location.hostname.includes('charlatte') || 
-                           document.querySelector('[data-charlatte-theme]');
+    const isCharlatteSite =
+      window.location.hostname.includes('charlatte') ||
+      document.querySelector('[data-charlatte-theme]');
     
     if (isCharlatteSite) {
       setTheme({ ...charlatteTheme, ...hostTheme });
@@ -161,10 +163,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const root = document.documentElement;
     
-    Object.entries(theme).forEach(([key, value]) => {
-      if (typeof value === 'string') {
-        const cssVarName = `--surge-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`;
-        root.style.setProperty(cssVarName, value);
+    (Object.entries(theme) as Array<[keyof Theme, string]>).forEach(([k, v]) => {
+      if (typeof v === 'string') {
+        const cssVarName = `--surge-${k.replace(/([A-Z])/g, '-$1').toLowerCase()}`;
+        root.style.setProperty(cssVarName, v);
       }
     });
   }, [theme]);
@@ -182,8 +184,8 @@ export function useTheme() {
   return context;
 }
 
-// CSS-in-JS helper for themed components
-export function themed(styles: (theme: Theme) => Record<string, any>) {
+// Hook-form (was "themed" causing rules-of-hooks violation)
+export function useThemed<T extends Record<string, unknown>>(factory: (theme: Theme) => T): T {
   const { theme } = useTheme();
-  return styles(theme);
+  return factory(theme);
 }

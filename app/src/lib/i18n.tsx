@@ -1,5 +1,6 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState } from 'react';
-import type { ReactNode } from 'react'; // type-only (fix TS1484)
+import type { ReactNode } from 'react'; // type-only
 
 type Language = 'en' | 'fr';
 
@@ -362,14 +363,22 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>('en');
 
   const t = (key: string): string => {
-    const keys = key.split('.');
-    let value: any = translations[language];
-    
-    for (const k of keys) {
-      value = value?.[k];
+    const segments = key.split('.');
+    let value: unknown = translations[language] as Record<string, unknown>;
+
+    for (const seg of segments) {
+      if (
+        value &&
+        typeof value === 'object' &&
+        seg in (value as Record<string, unknown>)
+      ) {
+        value = (value as Record<string, unknown>)[seg];
+      } else {
+        return key;
+      }
     }
-    
-    return value || key;
+
+    return typeof value === 'string' ? value : key;
   };
 
   return (

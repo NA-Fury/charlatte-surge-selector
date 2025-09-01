@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import React, { createContext, useContext, useState, type ReactNode, type Dispatch, type SetStateAction } from 'react';
 
 export type Media =
   | 'CleanWater' | 'Potable' | 'TSE' | 'NoSolids'
@@ -20,22 +21,22 @@ export interface FormState {
   email?: string;
   company?: string;
   country?: string;
-  phone?: string; // added
+  phone?: string;
   notes?: string;
 }
 
-const Ctx = createContext<{ 
-  state: FormState; 
-  setState: React.Dispatch<React.SetStateAction<FormState>> 
+const Ctx = createContext<{
+  state: FormState;
+  setState: Dispatch<SetStateAction<FormState>>;
 } | null>(null);
 
-export const Provider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function Provider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<FormState>({});
   return <Ctx.Provider value={{ state, setState }}>{children}</Ctx.Provider>;
-};
+}
 
-export const useStore = () => {
+export function useStore() {
   const c = useContext(Ctx);
   if (!c) throw new Error('Store missing Provider');
   return c;
-};
+}

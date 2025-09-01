@@ -211,7 +211,7 @@ export async function generatePDF(data: PDFData): Promise<void> {
     doc.setDrawColor(0, 0, 0);
     doc.line(centerX + vVesselWidth/2 + 15, vesselY - 10, centerX + vVesselWidth/2 + 15, vesselY + vVesselHeight + 10);
     doc.setFontSize(9);
-    // Removed doc.save()/doc.restore() (jsPDF has no restore) – angle option handles rotation
+    // (Removed doc.restore / doc.save – jsPDF lacks these; angle handles rotation)
     doc.text(`L = ${data.lengthMm || '----'} mm`, centerX + vVesselWidth/2 + 20, vesselY + vVesselHeight/2, { angle: 90 });
 
     doc.line(centerX - vVesselWidth/2, vesselY + vVesselHeight + 20, centerX + vVesselWidth/2, vesselY + vVesselHeight + 20);
