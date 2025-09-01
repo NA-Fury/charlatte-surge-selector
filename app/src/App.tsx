@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Stepper from './components/Stepper';
+import Application from './routes/Application';
+import Config from './routes/Config';
+import Sizing from './routes/Sizing';
+import Summary from './routes/Summary';
+import Contact from './routes/Contact';
+import EnhancedPage from './EnhancedPage';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const isEmbed = typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).has('embed');
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="min-h-screen bg-slate-50">
+      {!isEmbed && (
+        <header className="border-b bg-white">
+          <div className="mx-auto max-w-6xl p-4 flex items-center justify-between">
+            <div className="font-semibold">CHARLATTE RESERVOIRS — Surge Vessel Selector</div>
+            <div className="text-sm text-slate-500">Demo v0.1</div>
+          </div>
+        </header>
+      )}
 
-export default App
+      <main className="mx-auto max-w-6xl p-4 grid md:grid-cols-[240px_1fr] gap-6">
+        {!isEmbed && <aside><Stepper /></aside>}
+        <section className="bg-white rounded-2xl shadow p-6">
+          <Routes>
+            <Route path="/" element={<Navigate to="/application" replace />} />
+            <Route path="/application" element={<Application />} />
+            <Route path="/config" element={<Config />} />
+            <Route path="/sizing" element={<Sizing />} />
+            <Route path="/summary" element={<Summary />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/enhanced" element={<EnhancedPage />} />
+            <Route path="*" element={<Navigate to="/application" replace />} />
+          </Routes>
+        </section>
+      </main>
+    </div>
+  );
+}
