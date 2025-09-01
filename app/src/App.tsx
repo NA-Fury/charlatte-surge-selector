@@ -5,6 +5,7 @@ import Config from './routes/Config';
 import Sizing from './routes/Sizing';
 import Summary from './routes/Summary';
 import Contact from './routes/Contact';
+import EnhancedPage from './EnhancedPage';
 
 export default function App() {
   const isEmbed = typeof window !== 'undefined' &&
@@ -31,6 +32,7 @@ export default function App() {
             <Route path="/sizing" element={<Sizing />} />
             <Route path="/summary" element={<Summary />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/enhanced" element={<EnhancedPage />} />
             <Route path="*" element={<Navigate to="/application" replace />} />
           </Routes>
         </section>
