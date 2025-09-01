@@ -3,8 +3,15 @@ import { createContext, useContext, useState, type ReactNode, type Dispatch, typ
 
 export type Media =
   | 'CleanWater' | 'Potable' | 'TSE' | 'NoSolids'
-  | 'Sewage' | 'WasteWater' | 'Solids';
-export type Tech = 'AirWater' | 'Hydrochoc' | 'EUV' | 'ARAA';
+  | 'Sewage' | 'WasteWater' | 'Solids'
+  | 'Other';
+
+export type Tech =
+  | 'Hydrochoc'
+  | 'Hydrofort'
+  | 'EUV'
+  | 'ARAA'
+  | 'Compressor';
 export type Orientation = 'Horizontal' | 'Vertical';
 
 export interface FormState {
@@ -23,6 +30,7 @@ export interface FormState {
   country?: string;
   phone?: string;
   notes?: string;
+  otherMediaNote?: string;
 }
 
 const Ctx = createContext<{

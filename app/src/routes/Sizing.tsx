@@ -43,7 +43,6 @@ export default function Sizing() {
       case 'Hydrochoc': return '#0ea5e9';
       case 'EUV': return '#10b981';
       case 'ARAA': return '#8b5cf6';
-      case 'AirWater': return '#6366f1';
       default: return '#3b82f6';
     }
   }, [state.tech]);
