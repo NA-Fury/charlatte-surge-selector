@@ -1,27 +1,39 @@
-import { useNavigate } from 'react-router-dom';
 import { useStore } from '../lib/store';
+import { litresToUsGallons } from '../lib/sizing';
 
 export default function Summary() {
   const { state } = useStore();
-  const nav = useNavigate();
+  const L = state.capacityLitres ?? 0;
+  const gal = litresToUsGallons(L);
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Professional Summary</h1>
-      <div className="rounded-xl border p-4 bg-slate-50">
-        <ul className="grid md:grid-cols-2 gap-y-2 text-sm">
-          <li><span className="text-slate-500">Media:</span> {state.media ?? '—'}</li>
-          <li><span className="text-slate-500">Technology:</span> {state.tech ?? '—'}</li>
-          <li><span className="text-slate-500">Orientation:</span> {state.orientation ?? '—'}</li>
-          <li><span className="text-slate-500">Capacity (L):</span> {Math.round(state.capacityLitres ?? 0)}</li>
-          <li><span className="text-slate-500">Diameter (mm):</span> {state.diameterMm ?? '—'}</li>
-          <li><span className="text-slate-500">Length (mm):</span> {state.lengthMm ?? '—'}</li>
-        </ul>
-        <p className="mt-3 text-xs text-slate-500">
-          Preliminary selection only — a full surge analysis is required for final design and quote.
-        </p>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="rounded-xl bg-slate-50 p-4">
+          <div className="text-sm text-slate-500 mb-2">Configuration</div>
+          <ul className="space-y-1">
+            <li><strong>Media:</strong> {state.media ?? '—'}</li>
+            <li><strong>Technology:</strong> {state.tech ?? '—'}</li>
+            <li><strong>Orientation:</strong> {state.orientation ?? '—'}</li>
+          </ul>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-4">
+          <div className="text-sm text-slate-500 mb-2">Dimensions</div>
+          <ul className="space-y-1">
+            <li><strong>Capacity:</strong> {Math.round(L)} L ({Math.round(gal)} US gal)</li>
+            <li><strong>Diameter:</strong> {state.diameterMm ? `${state.diameterMm} mm` : '—'}</li>
+            <li><strong>Length:</strong> {state.lengthMm ? `${state.lengthMm} mm` : '—'}</li>
+          </ul>
+        </div>
       </div>
-      <div className="flex justify-end">
-        <button onClick={() => nav('/contact')} className="px-4 py-2 rounded-lg bg-blue-600 text-white">Continue to Contact</button>
+
+      <div className="p-4 rounded-xl border">
+        <div className="text-sm text-slate-600">
+          Final quote will require: quantity, design pressure, manufacturing code (ASME/EN/CODAP/AS1210/PD5500),
+          U-Stamp (if ASME), TPI requirement, pump curves, pipeline profiles, flow rate.
+        </div>
       </div>
     </div>
   );

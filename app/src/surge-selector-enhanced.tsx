@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createContext, useContext, useMemo } from 'react';
-import { ChevronRight, Info, CheckCircle, Settings, FileText, Phone, Droplets, Shield, Gauge, Zap, Wind, Package, Activity, ArrowRight, RotateCw, Maximize2, ZoomIn, ZoomOut, Move3d } from 'lucide-react';
+import { ChevronRight, Info, CheckCircle, Settings, FileText, Droplets, Shield, Gauge, Zap, Wind, Package, Activity, ArrowRight, RotateCw, ZoomIn, ZoomOut, Move3d } from 'lucide-react';
 
 // Types
 type Media = 'CleanWater' | 'Potable' | 'TSE' | 'NoSolids' | 'Sewage' | 'WasteWater' | 'Solids';
@@ -112,12 +112,12 @@ const VesselVisualization: React.FC<{
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     setIsDragging(true);
     setDragStart({ x: e.clientX - rotation.y, y: e.clientY - rotation.x });
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isDragging) return;
     setRotation({
       x: e.clientY - dragStart.y,
@@ -227,7 +227,7 @@ const VesselVisualization: React.FC<{
 
       <div className="absolute bottom-2 left-2 text-xs text-slate-400 flex items-center gap-1">
         <Move3d className="w-3 h-3" />
-        Drag to rotate • Scroll to zoom
+        Drag to rotate • Use buttons to zoom
       </div>
     </div>
   );
@@ -244,7 +244,8 @@ const calculateVolume = (diameterMm: number, lengthMm: number): number => {
 
 const litresToUsGallons = (l: number): number => l / 3.785411784;
 
-// Step Components
+// Step Components (Application, Config, Sizing, Summary, Contact)
+// -- ApplicationStep
 const ApplicationStep: React.FC = () => {
   const { state, setState } = useStore();
   const [hoveredMedia, setHoveredMedia] = useState<Media | null>(null);
@@ -275,7 +276,6 @@ const ApplicationStep: React.FC = () => {
           const Icon = m.icon;
           const isSelected = state.media === m.key;
           const isHovered = hoveredMedia === m.key;
-          
           return (
             <button
               key={m.key}
@@ -288,11 +288,9 @@ const ApplicationStep: React.FC = () => {
                   ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-cyan-50 shadow-lg scale-[1.02]' 
                   : 'border-slate-200 bg-white hover:border-blue-300 hover:shadow-md'
                 }
+                ${isHovered ? 'ring-2 ring-blue-300' : ''}
               `}
-              style={{
-                animationDelay: `${idx * 50}ms`,
-                animation: 'slideUp 0.5s ease-out forwards'
-              }}
+              style={{ animationDelay: `${idx * 50}ms`, animation: 'slideUp 0.5s ease-out forwards' }}
             >
               <div className="flex items-start gap-4">
                 <div className={`
@@ -331,12 +329,12 @@ const ApplicationStep: React.FC = () => {
   );
 };
 
+// -- ConfigStep
 const ConfigStep: React.FC = () => {
   const { state, setState } = useStore();
   const [dutyARAA, setDutyARAA] = useState(false);
   const [expandedProduct, setExpandedProduct] = useState<Tech | null>(null);
 
-  const hasSelectedMedia = Boolean(state.media);
   const hasSolids = state.media === 'Sewage' || state.media === 'WasteWater' || state.media === 'Solids';
 
   const availableTechs = useMemo(() => {
@@ -344,11 +342,6 @@ const ConfigStep: React.FC = () => {
     if (dutyARAA) return ['ARAA' as Tech];
     return ['AirWater', 'Hydrochoc', 'Hydrofort', 'Compressor'] as Tech[];
   }, [hasSolids, dutyARAA]);
-
-  const availableOrientations = useMemo(() => {
-    if (state.tech === 'EUV' || state.tech === 'ARAA') return ['Vertical' as Orientation];
-    return ['Horizontal', 'Vertical'] as Orientation[];
-  }, [state.tech]);
 
   return (
     <div className="space-y-8 animate-fadeIn">
@@ -468,7 +461,10 @@ const ConfigStep: React.FC = () => {
         <div className="space-y-4 animate-slideUp">
           <h2 className="text-xl font-semibold">Select Orientation</h2>
           <div className="grid grid-cols-2 gap-4">
-            {availableOrientations.map((orientation) => {
+            {(['Horizontal','Vertical'] as Orientation[]).map((orientation) => {
+              const onlyVertical = state.tech === 'EUV' || state.tech === 'ARAA';
+              if (onlyVertical && orientation === 'Horizontal') return null;
+
               const isSelected = state.orientation === orientation;
               return (
                 <button
@@ -483,7 +479,6 @@ const ConfigStep: React.FC = () => {
                   `}
                 >
                   <div className="flex flex-col items-center gap-4">
-                    {/* Simple visual representation */}
                     <div className={`
                       ${orientation === 'Horizontal' ? 'w-20 h-10' : 'w-10 h-20'}
                       bg-gradient-to-br from-blue-400 to-blue-600 rounded-full shadow-lg
@@ -503,6 +498,7 @@ const ConfigStep: React.FC = () => {
   );
 };
 
+// -- SizingStep (kept as in your version; uses visualization)
 const SizingStep: React.FC = () => {
   const { state, setState } = useStore();
   const [mode, setMode] = useState<'capacity' | 'dimensions'>('dimensions');
@@ -584,16 +580,16 @@ const SizingStep: React.FC = () => {
               value={diameter}
               onChange={(e) => setDiameter(Number(e.target.value))}
               className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-              min="100"
-              max="5000"
+              min={100}
+              max={5000}
             />
             <input
               type="range"
               value={diameter}
               onChange={(e) => setDiameter(Number(e.target.value))}
               className="w-full mt-2"
-              min="100"
-              max="5000"
+              min={100}
+              max={5000}
             />
           </div>
           
@@ -606,16 +602,16 @@ const SizingStep: React.FC = () => {
               value={length}
               onChange={(e) => setLength(Number(e.target.value))}
               className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-              min="500"
-              max="10000"
+              min={500}
+              max={10000}
             />
             <input
               type="range"
               value={length}
               onChange={(e) => setLength(Number(e.target.value))}
               className="w-full mt-2"
-              min="500"
-              max="10000"
+              min={500}
+              max={10000}
             />
           </div>
         </div>
@@ -629,8 +625,8 @@ const SizingStep: React.FC = () => {
             value={capacity}
             onChange={(e) => setCapacity(Number(e.target.value))}
             className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-            min="100"
-            max="120000"
+            min={100}
+            max={120000}
           />
           <p className="mt-2 text-sm text-slate-500">
             Dimensions will be automatically calculated based on technology and orientation
@@ -677,10 +673,10 @@ const SizingStep: React.FC = () => {
   );
 };
 
+// -- SummaryStep
 const SummaryStep: React.FC = () => {
   const { state } = useStore();
   const volume = state.capacityLitres || calculateVolume(state.diameterMm || 1000, state.lengthMm || 2500);
-  
   const productInfo = state.tech ? PRODUCTS[state.tech as keyof typeof PRODUCTS] : null;
 
   return (
@@ -694,7 +690,6 @@ const SummaryStep: React.FC = () => {
         </p>
       </div>
 
-      {/* Product Card */}
       {productInfo && (
         <div className={`p-6 rounded-2xl bg-gradient-to-br ${productInfo.color} text-white shadow-xl`}>
           <div className="flex items-center gap-4 mb-4">
@@ -707,7 +702,6 @@ const SummaryStep: React.FC = () => {
         </div>
       )}
 
-      {/* Configuration Details */}
       <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <h3 className="font-semibold text-lg">Configuration</h3>
@@ -742,32 +736,28 @@ const SummaryStep: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Requirements Notice */}
-      <div className="p-6 bg-blue-50 border-2 border-blue-200 rounded-xl">
-        <h3 className="font-semibold text-blue-900 mb-3">Final Quote Requirements</h3>
-        <div className="grid md:grid-cols-2 gap-4 text-sm text-blue-800">
-          <ul className="space-y-2">
-            <li>• Quantity / Number of Products</li>
-            <li>• Design Pressure</li>
-            <li>• Manufacturing Code (ASME, EN, etc.)</li>
-            <li>• U-Stamp Requirements (if ASME)</li>
-          </ul>
-          <ul className="space-y-2">
-            <li>• TPI Requirements</li>
-            <li>• Pump Curves</li>
-            <li>• Pipeline Profiles</li>
-            <li>• Flow Rate Details</li>
-          </ul>
-        </div>
-      </div>
     </div>
   );
 };
 
+// -- ContactStep (typed)
+type Code = 'ASME' | 'EN' | 'CODAP' | 'AS1210' | 'PD5500';
+interface ContactForm {
+  name: string; email: string; phone: string; company: string; country: string; notes: string;
+  code: Code; uStamp: boolean; tpi: boolean;
+}
+const contactFields = [
+  { key: 'name', label: 'Full Name' },
+  { key: 'email', label: 'Email Address' },
+  { key: 'phone', label: 'Phone Number' },
+  { key: 'company', label: 'Company / Organization' },
+  { key: 'country', label: 'Country / Region' },
+] as const;
+type ContactKey = typeof contactFields[number]['key'];
+
 const ContactStep: React.FC = () => {
   const { state, setState } = useStore();
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<ContactForm>({
     name: state.name || '',
     email: state.email || '',
     phone: state.phone || '',
@@ -778,6 +768,8 @@ const ContactStep: React.FC = () => {
     uStamp: state.uStamp || false,
     tpi: state.tpi || false
   });
+
+  function setContact<K extends ContactKey>(k: K, v: string) { setForm(f => ({ ...f, [k]: v })); }
 
   const handleSubmit = () => {
     setState(s => ({ ...s, ...form }));
@@ -795,24 +787,13 @@ const ContactStep: React.FC = () => {
         </p>
       </div>
 
-      {/* Contact Form */}
       <div className="grid md:grid-cols-2 gap-6">
-        {[
-          { key: 'name', label: 'Full Name', type: 'text', icon: '👤' },
-          { key: 'email', label: 'Email Address', type: 'email', icon: '📧' },
-          { key: 'phone', label: 'Phone Number', type: 'tel', icon: '📞' },
-          { key: 'company', label: 'Company / Organization', type: 'text', icon: '🏢' },
-          { key: 'country', label: 'Country / Region', type: 'text', icon: '🌍' },
-        ].map(field => (
+        {contactFields.map(field => (
           <div key={field.key}>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              <span className="mr-2">{field.icon}</span>
-              {field.label}
-            </label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">{field.label}</label>
             <input
-              type={field.type}
-              value={(form as any)[field.key]}
-              onChange={(e) => setForm(f => ({ ...f, [field.key]: e.target.value }))}
+              value={form[field.key]}
+              onChange={(e) => setContact(field.key, e.target.value)}
               className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
               required
             />
@@ -820,7 +801,6 @@ const ContactStep: React.FC = () => {
         ))}
       </div>
 
-      {/* Manufacturing Standards */}
       <div className="space-y-4">
         <h3 className="font-semibold text-lg">Manufacturing Standards</h3>
         <div className="grid md:grid-cols-3 gap-4">
@@ -830,7 +810,7 @@ const ContactStep: React.FC = () => {
             </label>
             <select
               value={form.code}
-              onChange={(e) => setForm(f => ({ ...f, code: e.target.value as any }))}
+              onChange={(e) => setForm(f => ({ ...f, code: e.target.value as Code }))}
               className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
             >
               <option value="ASME">ASME BPVC Sec VIII</option>
@@ -865,35 +845,6 @@ const ContactStep: React.FC = () => {
         </div>
       </div>
 
-      {/* Additional Notes */}
-      <div>
-        <label className="block text-sm font-medium text-slate-700 mb-2">
-          Additional Requirements / Questions
-        </label>
-        <textarea
-          value={form.notes}
-          onChange={(e) => setForm(f => ({ ...f, notes: e.target.value }))}
-          className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-          rows={4}
-          placeholder="Please describe any specific requirements, site conditions, or questions..."
-        />
-      </div>
-
-      {/* Response Time */}
-      <div className="p-6 bg-green-50 border-2 border-green-200 rounded-xl">
-        <h3 className="font-semibold text-green-900 mb-2 flex items-center gap-2">
-          <Phone className="w-5 h-5" />
-          What Happens Next?
-        </h3>
-        <ul className="space-y-2 text-sm text-green-800">
-          <li>✓ Your inquiry will be sent to our Hydraulic Department</li>
-          <li>✓ A technical specialist will review your requirements</li>
-          <li>✓ You'll receive a detailed quote within 24-48 hours</li>
-          <li>✓ Optional: Schedule a consultation to discuss your project</li>
-        </ul>
-      </div>
-
-      {/* Submit Button */}
       <button
         onClick={handleSubmit}
         className="w-full py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
@@ -905,7 +856,7 @@ const ContactStep: React.FC = () => {
   );
 };
 
-// Main App Component
+// Main Demo App (single-page wizard)
 export default function App() {
   const [state, setState] = useState<FormState>({});
   const [currentStep, setCurrentStep] = useState(0);
@@ -928,22 +879,13 @@ export default function App() {
       case 0: return Boolean(state.media);
       case 1: return Boolean(state.tech && state.orientation);
       case 2: return Boolean(state.capacityLitres || (state.diameterMm && state.lengthMm));
-      case 3: return true;
-      case 4: return true;
-      default: return false;
+      default: return true;
     }
   };
 
   return (
     <StoreContext.Provider value={{ state, setState }}>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
-        {/* Animated Background */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000" />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000" />
-        </div>
-
         {/* Header */}
         {!isEmbed && (
           <header className="relative bg-white/80 backdrop-blur-lg border-b border-slate-200 sticky top-0 z-50">
@@ -1005,18 +947,6 @@ export default function App() {
                   })}
                 </ol>
               </div>
-
-              {/* Help Card */}
-              <div className="bg-gradient-to-br from-purple-500 to-indigo-600 text-white rounded-2xl shadow-lg p-6">
-                <h3 className="font-semibold mb-2">Need Help?</h3>
-                <p className="text-sm opacity-90 mb-4">
-                  Our experts are ready to assist with your surge protection needs
-                </p>
-                <button className="w-full py-2 bg-white/20 backdrop-blur rounded-lg hover:bg-white/30 transition-colors">
-                  <Phone className="inline w-4 h-4 mr-2" />
-                  Contact Support
-                </button>
-              </div>
             </aside>
           )}
 
@@ -1060,45 +990,17 @@ export default function App() {
       </div>
 
       <style>{`
-        @keyframes blob {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-          100% { transform: translate(0px, 0px) scale(1); }
-        }
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideDown {
-          from { opacity: 0; height: 0; }
-          to { opacity: 1; height: auto; }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.5s ease-out;
-        }
-        .animate-slideUp {
-          animation: slideUp 0.3s ease-out;
-        }
-        .animate-slideDown {
-          animation: slideDown 0.3s ease-out;
-        }
-        .preserve-3d {
-          transform-style: preserve-3d;
-        }
+        @keyframes blob { 0% { transform: translate(0,0) scale(1); } 33% { transform: translate(30px,-50px) scale(1.1); } 66% { transform: translate(-20px,20px) scale(0.9); } 100% { transform: translate(0,0) scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideDown { from { opacity: 0; height: 0; } to { opacity: 1; height: auto; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .animate-blob { animation: blob 7s infinite; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+        .animate-fadeIn { animation: fadeIn 0.5s ease-out; }
+        .animate-slideUp { animation: slideUp 0.3s ease-out; }
+        .animate-slideDown { animation: slideDown 0.3s ease-out; }
+        .preserve-3d { transform-style: preserve-3d; }
       `}</style>
     </StoreContext.Provider>
   );

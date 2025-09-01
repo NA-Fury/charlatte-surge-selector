@@ -1,27 +1,29 @@
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 
-const labels = ['Application', 'Configuration', 'Sizing', 'Summary', 'Contact'];
-const paths  = ['/application','/config','/sizing','/summary','/contact'];
+const steps = [
+  { to: '/application', label: 'Application' },
+  { to: '/config', label: 'Configuration' },
+  { to: '/sizing', label: 'Sizing' },
+  { to: '/summary', label: 'Summary' },
+  { to: '/contact', label: 'Contact' },
+];
 
 export default function Stepper() {
   const { pathname } = useLocation();
-  const i = Math.max(0, paths.indexOf(pathname));
   return (
-    <ol className="space-y-3">
-      {labels.map((label, idx) => {
-        const active = idx <= i;
+    <nav className="space-y-2">
+      {steps.map((s, i) => {
+        const active = pathname.startsWith(s.to);
         return (
-          <li className="flex items-center gap-3" key={label}>
-            <span className={`w-7 h-7 rounded-full flex items-center justify-center border text-sm
-              ${active ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-500 border-slate-300'}`}>
-              {idx + 1}
-            </span>
-            <Link to={paths[idx]} className={`text-sm hover:underline ${active ? 'text-blue-700' : 'text-slate-500'}`}>
-              {label}
-            </Link>
-          </li>
+          <Link
+            key={s.to}
+            to={s.to}
+            className={`block px-3 py-2 rounded-lg border text-sm
+            ${active ? 'border-blue-600 text-blue-700 bg-blue-50' : 'border-slate-200 hover:bg-slate-50'}`}>
+            {i + 1}. {s.label}
+          </Link>
         );
       })}
-    </ol>
+    </nav>
   );
 }
