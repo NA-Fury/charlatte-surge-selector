@@ -17,8 +17,10 @@ const PRODUCTS: Record<Tech, {
     features: [
       'Surge protection',
       'Water in bladder design',
-      'Horizontal up to 120,000 L',
-      'Vertical up to 60,000 L'
+      'No Air-to-Water Contact',
+      'Food Quality Certified Butyl Bladder',
+      'Horizontal Bladder up to 125,000 L',
+      'Vertical Bladder up to 80,000 L'
     ],
     color: 'from-sky-500 to-cyan-600'
   },
@@ -28,8 +30,6 @@ const PRODUCTS: Record<Tech, {
     features: [
       'Pump cycle control / water storage',
       'Water in bladder design',
-      'Horizontal up to 120,000 L',
-      'Vertical up to 60,000 L'
     ],
     color: 'from-cyan-500 to-blue-600'
   },
@@ -50,6 +50,8 @@ const PRODUCTS: Record<Tech, {
     features: [
       'For surge protection',
       'Design with no bladder',
+      'No Electricity Require',
+      'Low Maintenance',
       'Low pressure / zero static head',
       'Vertical only up to 80,000 L'
     ],

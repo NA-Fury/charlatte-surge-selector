@@ -185,11 +185,10 @@ export default function Contact() {
                 backgroundColor: theme.bgTertiary
               }}
             >
-              <option value="ASME">ASME BPVC Sec VIII</option>
+              <option value="ASME">ASME BPVC Sec VIII Div 1</option>
               <option value="EN">EN 13445</option>
               <option value="CODAP">CODAP (France)</option>
-              <option value="AS1210">AS 1210 (Australia)</option>
-              <option value="PD5500">PD 5500 (UK)</option>
+              <option value="AS1210">AS1210 (Australia)</option>
             </select>
           </div>
           
