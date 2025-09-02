@@ -12,3 +12,12 @@ cd charlatte-surge-selector/app
 npm ci
 npm run dev
 # Demo look: http://localhost:5173/?demo=1
+```
+
+## Tests
+```bash
+cd app
+npm run test          # run unit tests once
+npm run test:watch    # watch mode during development
+npm run test:coverage # generate coverage report
+```
