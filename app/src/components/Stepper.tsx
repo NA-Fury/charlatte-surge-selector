@@ -3,7 +3,7 @@ import { useLocation, Link } from 'react-router-dom';
 const steps = [
   { to: '/application', label: 'Application' },
   { to: '/project', label: 'Project Information' },
-  { to: '/designer', label: 'Design (Selector + Sizing)' },
+  { to: '/designer', label: 'Design & Sizing' },
   { to: '/summary', label: 'Summary' },
   { to: '/contact', label: 'Contact' },
 ];

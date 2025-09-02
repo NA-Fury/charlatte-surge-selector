@@ -11,6 +11,7 @@ const Config = lazy(() => import('./routes/Config'));
 const Sizing = lazy(() => import('./routes/Sizing'));
 const Summary = lazy(() => import('./routes/Summary'));
 const Contact = lazy(() => import('./routes/Contact'));
+const AQ10 = lazy(() => import('./routes/AQ10'));
 import { useTranslation } from './lib/i18n';
 import { useTheme } from './lib/theme';
 
@@ -137,6 +138,7 @@ export default function App() {
                 <Route path="/sizing" element={<Sizing />} />
                 <Route path="/summary" element={<Summary />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/aq10" element={<AQ10 />} />
                 <Route path="*" element={<Navigate to="/application" replace />} />
               </Routes>
             </Suspense>
@@ -146,3 +148,7 @@ export default function App() {
     </div>
   );
 }
+
+
+
+

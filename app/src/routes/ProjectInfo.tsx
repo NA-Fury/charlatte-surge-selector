@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../lib/store';
-import { Info } from 'lucide-react';
+import { Info, Droplet, Gauge, LineChart } from 'lucide-react';
 
 function Help({ text }: { text: string }) {
   return (
@@ -31,10 +31,12 @@ export default function ProjectInfo() {
     <div className="space-y-8">
       <h1 className="text-2xl font-semibold">Project Information</h1>
 
-      {/* Q1 */}
+      {/* Operation Type */}
       <section className="space-y-3">
         <div className="flex items-center gap-2">
-          <h2 className="font-medium">Q1) Operation Type</h2>
+          <Droplet className="w-5 h-5 text-blue-600" />
+          <h2 className="font-medium">Operation Type</h2>
+          <Help text={"Pumping lines typically require surge protection; gravity lines usually do not."} />
         </div>
         <div className="flex gap-3 flex-wrap">
           {(['Pumping', 'Gravity'] as const).map(v => (
@@ -44,7 +46,7 @@ export default function ProjectInfo() {
                 ...s,
                 operationType: v,
                 // If gravity, default surge protection to false
-                requireSurgeProtection: v === 'Gravity' ? false : s.requireSurgeProtection,
+                requireSurgeProtection: v === 'Gravity' ? false : true,
               }))}
               className={`px-4 py-2 rounded-lg border ${state.operationType === v ? 'border-blue-600 ring-2 ring-blue-200' : 'border-slate-200 hover:border-blue-400'}`}
             >
@@ -52,16 +54,20 @@ export default function ProjectInfo() {
             </button>
           ))}
         </div>
+        {state.operationType === 'Pumping' && (
+          <p className="text-sm text-emerald-700">Great! Please note that you will need surge protection.</p>
+        )}
         {state.operationType === 'Gravity' && (
-          <p className="text-sm text-slate-600">Gravity line selected — surge protection generally not required. Q2 is disabled.</p>
+          <p className="text-sm text-slate-600">Great, please note that surge protection is not required.</p>
         )}
       </section>
 
-      {/* Q2 */}
+      {/* Surge Protection */}
       <section className="space-y-3">
         <div className="flex items-center gap-2">
-          <h2 className="font-medium">Q2) Surge Vessel Protection</h2>
-          <Help text={"Surge protection helps mitigate water hammer and pressure spikes in pipelines (e.g., pump starts/stops, long rising mains)."} />
+          <Gauge className="w-5 h-5 text-blue-600" />
+          <h2 className="font-medium">Surge Vessel Protection</h2>
+          <Help text={"Surge protection mitigates water hammer and pressure spikes in pipelines (e.g., pump starts/stops, long rising mains)."} />
         </div>
         <div className="flex gap-3 flex-wrap">
           {['Yes', 'No', 'Unsure'].map(v => (
@@ -84,11 +90,12 @@ export default function ProjectInfo() {
         </div>
       </section>
 
-      {/* Q2 a-1 */}
+      {/* Surge Analysis */}
       {state.requireSurgeProtection && (
         <section className="space-y-3">
           <div className="flex items-center gap-2">
-            <h2 className="font-medium">Q2 a-1) Has a Surge Analysis been done?</h2>
+            <LineChart className="w-5 h-5 text-blue-600" />
+            <h2 className="font-medium">Has a Surge Analysis been completed?</h2>
           </div>
           <div className="flex gap-3 flex-wrap">
             {(['Yes', 'No', 'Unsure'] as const).map(v => (
@@ -102,17 +109,39 @@ export default function ProjectInfo() {
             ))}
           </div>
           {state.surgeAnalysisDone === 'No' && (
-            <div className="text-sm text-slate-600">
-              Not a problem. Please fill the AQ10 form, then proceed to Contact. We offer free surge analysis.
+            <div className="text-sm text-slate-700 space-y-2">
+              <p>Not a problem. Let’s see what we can do with the data you do have right now.</p>
+              <p>
+                <a href="/aq10" target="_blank" rel="noopener" className="text-blue-600 underline">Open AQ10 form</a> in a new tab, fill the details, and save. We’ll send your answers to our hydraulic department for a free surge study.
+              </p>
+            </div>
+          )}
+          {typeof window !== 'undefined' && localStorage.getItem('aq10Data') && (
+            <div className="flex items-center gap-2 text-sm">
+              <button
+                className="px-3 py-1.5 rounded-lg border"
+                onClick={() => {
+                  try {
+                    const data = JSON.parse(localStorage.getItem('aq10Data') || '{}');
+                    setState(s => ({ ...s, notes: (s.notes ? s.notes + '\n' : '') + `AQ10: ${data.projectName || ''} – ${data.notes || ''}` }));
+                  } catch {
+                    // ignore JSON parse errors
+                  }
+                }}
+              >
+                Import AQ10 answers
+              </button>
+              <span className="text-slate-500">(detected saved data)</span>
             </div>
           )}
         </section>
       )}
 
-      {/* Q3 */}
+      {/* Pressure Boosting */}
       <section className="space-y-3">
         <div className="flex items-center gap-2">
-          <h2 className="font-medium">Q3) Pressure Boosting?</h2>
+          <Gauge className="w-5 h-5 text-blue-600" />
+          <h2 className="font-medium">Pressure Boosting?</h2>
           <Help text={"Pressure boosting increases delivery pressure for end-use or network stabilization."} />
         </div>
         <div className="flex gap-3 flex-wrap">
@@ -128,10 +157,10 @@ export default function ProjectInfo() {
         </div>
       </section>
 
-      {/* Q4 only for solids/wastewater/sewage */}
+      {/* Pipeline Questions (only for solids/wastewater/sewage) */}
       {hasSolids && (
         <section className="space-y-3">
-          <h2 className="font-medium">Q4) Pipeline Questions</h2>
+          <h2 className="font-medium">Pipeline Questions</h2>
           <div className="flex gap-2 flex-wrap items-center">
             <span className="text-sm">Continuous Pump Operation?</span>
             {[true, false].map(v => (
@@ -175,4 +204,3 @@ export default function ProjectInfo() {
     </div>
   );
 }
-
