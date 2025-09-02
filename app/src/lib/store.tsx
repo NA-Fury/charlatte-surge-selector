@@ -32,13 +32,16 @@ export interface FormState {
   notes?: string;
   otherMediaNote?: string;
 
-  // Project Info (Page 2)
   operationType?: 'Pumping' | 'Gravity';
-  requireSurgeProtection?: boolean; // Q2
-  surgeAnalysisDone?: 'Yes' | 'No' | 'Unsure'; // Q2 a-1
-  pressureBoosting?: boolean; // Q3
-  pipelineContinuous?: boolean; // Q4a
-  pipelineFlat?: boolean; // Q4b
+  requireSurgeProtection?: boolean;
+  surgeAnalysisDone?: 'Yes' | 'No'; // removed 'Unsure'
+  pressureBoosting?: boolean;
+  pipelineContinuous?: boolean;
+  pipelineFlat?: boolean;
+
+  // New extra project details
+  designPressureBar?: number;
+  pipelineLengthM?: number;
 }
 
 const Ctx = createContext<{

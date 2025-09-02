@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../lib/store';
-import { Info, Droplet, Gauge, LineChart } from 'lucide-react';
+import { Info, Droplet, Gauge, LineChart, Ruler, Activity } from 'lucide-react';
 
 function Help({ text }: { text: string }) {
   return (
@@ -18,13 +18,17 @@ export default function ProjectInfo() {
   const hasSolids = state.media === 'Sewage' || state.media === 'WasteWater' || state.media === 'Solids';
 
   const handleNext = () => {
-    // If user requires surge protection and has analysis = Yes, send to Designer for sizing.
     if (state.requireSurgeProtection && state.surgeAnalysisDone === 'No') {
-      // Guide to AQ10 and then contact page
       nav('/contact');
       return;
     }
     nav('/designer');
+  };
+
+  // Helper to update numeric fields safely
+  const parseNum = (v: string) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : undefined;
   };
 
   return (
@@ -45,8 +49,7 @@ export default function ProjectInfo() {
               onClick={() => setState(s => ({
                 ...s,
                 operationType: v,
-                // If gravity, default surge protection to false
-                requireSurgeProtection: v === 'Gravity' ? false : true,
+                requireSurgeProtection: v === 'Pumping' ? true : s.requireSurgeProtection === true ? true : undefined,
               }))}
               className={`px-4 py-2 rounded-lg border ${state.operationType === v ? 'border-blue-600 ring-2 ring-blue-200' : 'border-slate-200 hover:border-blue-400'}`}
             >
@@ -55,42 +58,57 @@ export default function ProjectInfo() {
           ))}
         </div>
         {state.operationType === 'Pumping' && (
-          <p className="text-sm text-emerald-700">Great! Please note that you will need surge protection.</p>
+          <p className="text-sm text-emerald-700">Pumping selected: Surge protection is required and locked to Yes.</p>
         )}
         {state.operationType === 'Gravity' && (
-          <p className="text-sm text-slate-600">Great, please note that surge protection is not required.</p>
+          <p className="text-sm text-slate-600">Gravity selected: Surge protection usually not required, but you may choose Yes if needed.</p>
         )}
       </section>
 
-      {/* Surge Protection */}
+      {/* Surge Protection (Yes/No only; Yes locked when Pumping) */}
       <section className="space-y-3">
         <div className="flex items-center gap-2">
           <Gauge className="w-5 h-5 text-blue-600" />
           <h2 className="font-medium">Surge Vessel Protection</h2>
-          <Help text={"Surge protection mitigates water hammer and pressure spikes in pipelines (e.g., pump starts/stops, long rising mains)."} />
+          <Help text={"Surge protection mitigates water hammer and pressure spikes (pump starts/stops, long rising mains)."} />
         </div>
         <div className="flex gap-3 flex-wrap">
-          {['Yes', 'No', 'Unsure'].map(v => (
-            <button
-              key={v}
-              onClick={() => setState(s => ({
-                ...s,
-                requireSurgeProtection: v === 'Yes' ? true : v === 'No' ? false : undefined,
-              }))}
-              disabled={state.operationType === 'Gravity'}
-              className={`px-4 py-2 rounded-lg border ${
-                ((state.requireSurgeProtection === true && v === 'Yes') || (state.requireSurgeProtection === false && v === 'No') || (state.requireSurgeProtection === undefined && v === 'Unsure'))
-                  ? 'border-blue-600 ring-2 ring-blue-200'
-                  : 'border-slate-200 hover:border-blue-400'
-              } disabled:opacity-50`}
-            >
-              {v}
-            </button>
-          ))}
+          {(['Yes', 'No'] as const).map(v => {
+            const isYes = v === 'Yes';
+            const lockedYes = state.operationType === 'Pumping' && isYes;
+            const disabled = state.operationType === 'Pumping' ? !isYes : false;
+            const active =
+              (state.requireSurgeProtection === true && isYes) ||
+              (state.requireSurgeProtection === false && !isYes) ||
+              (state.requireSurgeProtection === undefined && false);
+            return (
+              <button
+                key={v}
+                disabled={disabled}
+                onClick={() =>
+                  setState(s => ({
+                    ...s,
+                    requireSurgeProtection: isYes ? true : false
+                  }))
+                }
+                className={`relative px-4 py-2 rounded-lg border transition
+                  ${active ? 'border-blue-600 ring-2 ring-blue-200' : 'border-slate-200 hover:border-blue-400'}
+                  ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
+                `}
+              >
+                {v}
+                {lockedYes && (
+                  <span className="absolute -top-1 -right-1 text-[10px] px-1.5 py-0.5 rounded bg-blue-600 text-white">
+                    Locked
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </section>
 
-      {/* Surge Analysis */}
+      {/* Surge Analysis (only if surge protection required) */}
       {state.requireSurgeProtection && (
         <section className="space-y-3">
           <div className="flex items-center gap-2">
@@ -98,7 +116,7 @@ export default function ProjectInfo() {
             <h2 className="font-medium">Has a Surge Analysis been completed?</h2>
           </div>
           <div className="flex gap-3 flex-wrap">
-            {(['Yes', 'No', 'Unsure'] as const).map(v => (
+            {(['Yes', 'No'] as const).map(v => (
               <button
                 key={v}
                 onClick={() => setState(s => ({ ...s, surgeAnalysisDone: v }))}
@@ -110,9 +128,9 @@ export default function ProjectInfo() {
           </div>
           {state.surgeAnalysisDone === 'No' && (
             <div className="text-sm text-slate-700 space-y-2">
-              <p>Not a problem. Let’s see what we can do with the data you do have right now.</p>
+              <p>No analysis yet? Provide approximate data below and optionally fill the AQ10 form for a free surge study.</p>
               <p>
-                <a href="/aq10" target="_blank" rel="noopener" className="text-blue-600 underline">Open AQ10 form</a> in a new tab, fill the details, and save. We’ll send your answers to our hydraulic department for a free surge study.
+                <a href="/aq10" target="_blank" rel="noopener" className="text-blue-600 underline">Open AQ10 form</a>
               </p>
             </div>
           )}
@@ -123,15 +141,20 @@ export default function ProjectInfo() {
                 onClick={() => {
                   try {
                     const data = JSON.parse(localStorage.getItem('aq10Data') || '{}');
-                    setState(s => ({ ...s, notes: (s.notes ? s.notes + '\n' : '') + `AQ10: ${data.projectName || ''} – ${data.notes || ''}` }));
+                    setState(s => ({
+                      ...s,
+                      notes:
+                        (s.notes ? s.notes + '\n' : '') +
+                        `AQ10: ${data.projectName || ''} – ${data.notes || ''}`
+                    }));
                   } catch {
-                    // ignore JSON parse errors
+                    // ignore
                   }
                 }}
               >
                 Import AQ10 answers
               </button>
-              <span className="text-slate-500">(detected saved data)</span>
+              <span className="text-slate-500">(saved data detected)</span>
             </div>
           )}
         </section>
@@ -142,7 +165,7 @@ export default function ProjectInfo() {
         <div className="flex items-center gap-2">
           <Gauge className="w-5 h-5 text-blue-600" />
           <h2 className="font-medium">Pressure Boosting?</h2>
-          <Help text={"Pressure boosting increases delivery pressure for end-use or network stabilization."} />
+          <Help text={"Boosting systems increase network pressure or stabilize delivery."} />
         </div>
         <div className="flex gap-3 flex-wrap">
           {[true, false].map(v => (
@@ -157,44 +180,83 @@ export default function ProjectInfo() {
         </div>
       </section>
 
-      {/* Pipeline Questions (only for solids/wastewater/sewage) */}
+      {/* Pipeline Questions (solids media only) */}
       {hasSolids && (
         <section className="space-y-3">
           <h2 className="font-medium">Pipeline Questions</h2>
-          <div className="flex gap-2 flex-wrap items-center">
-            <span className="text-sm">Continuous Pump Operation?</span>
-            {[true, false].map(v => (
-              <button
-                key={'cont-' + String(v)}
-                onClick={() => setState(s => ({ ...s, pipelineContinuous: v }))}
-                className={`px-3 py-1.5 rounded-lg border ${state.pipelineContinuous === v ? 'border-blue-600 ring-2 ring-blue-200' : 'border-slate-200 hover:border-blue-400'}`}
-              >
-                {v ? 'Yes' : 'No'}
-              </button>
-            ))}
-          </div>
-          <div className="flex gap-2 flex-wrap items-center">
-            <span className="text-sm">Pipeline Profile Relatively Flat?</span>
-            {[true, false].map(v => (
-              <button
-                key={'flat-' + String(v)}
-                onClick={() => setState(s => ({ ...s, pipelineFlat: v }))}
-                className={`px-3 py-1.5 rounded-lg border ${state.pipelineFlat === v ? 'border-blue-600 ring-2 ring-blue-200' : 'border-slate-200 hover:border-blue-400'}`}
-              >
-                {v ? 'Yes' : 'No'}
-              </button>
-            ))}
-          </div>
-          <div className="text-xs text-slate-600">
-            Guidance: Continuous or Flat → EUV visible. 1-2 starts/day + Flat → ARAA visible.
-          </div>
+            <div className="flex gap-2 flex-wrap items-center">
+              <span className="text-sm">Continuous Pump Operation?</span>
+              {[true, false].map(v => (
+                <button
+                  key={'cont-' + String(v)}
+                  onClick={() => setState(s => ({ ...s, pipelineContinuous: v }))}
+                  className={`px-3 py-1.5 rounded-lg border ${state.pipelineContinuous === v ? 'border-blue-600 ring-2 ring-blue-200' : 'border-slate-200 hover:border-blue-400'}`}
+                >
+                  {v ? 'Yes' : 'No'}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-2 flex-wrap items-center">
+              <span className="text-sm">Pipeline Profile Relatively Flat?</span>
+              {[true, false].map(v => (
+                <button
+                  key={'flat-' + String(v)}
+                  onClick={() => setState(s => ({ ...s, pipelineFlat: v }))}
+                  className={`px-3 py-1.5 rounded-lg border ${state.pipelineFlat === v ? 'border-blue-600 ring-2 ring-blue-200' : 'border-slate-200 hover:border-blue-400'}`}
+                >
+                  {v ? 'Yes' : 'No'}
+                </button>
+              ))}
+            </div>
+            <div className="text-xs text-slate-600">
+              Guidance: Continuous or Flat → EUV visible. Low starts + Flat → ARAA may be applicable.
+            </div>
         </section>
       )}
 
-      {/* Q5 placeholder */}
-      <section className="space-y-2">
-        <h2 className="font-medium">Q5) Environmental Questions</h2>
-        <p className="text-sm text-slate-500">TBD</p>
+      {/* Replaces removed Q5: Key Design Inputs */}
+      <section className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Ruler className="w-5 h-5 text-blue-600" />
+          <h2 className="font-medium">Key Design Inputs</h2>
+          <Help text={"Basic sizing context to refine vessel selection and preliminary dimensions."} />
+        </div>
+        <div className="grid md:grid-cols-3 gap-4">
+          <label className="flex flex-col gap-1 text-sm">
+            <span>Design Pressure (bar)</span>
+            <input
+              type="number"
+              min={0}
+              step={0.1}
+              value={state.designPressureBar ?? ''}
+              onChange={e => setState(s => ({ ...s, designPressureBar: parseNum(e.target.value) }))}
+              className="px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-300 outline-none bg-white"
+              placeholder="e.g. 10"
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm">
+            <span>Approx. Pipeline Length (m)</span>
+            <input
+              type="number"
+              min={0}
+              step={1}
+              value={state.pipelineLengthM ?? ''}
+              onChange={e => setState(s => ({ ...s, pipelineLengthM: parseNum(e.target.value) }))}
+              className="px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-300 outline-none bg-white"
+              placeholder="e.g. 1500"
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm">
+            <span>Notes (optional)</span>
+            <input
+              type="text"
+              value={state.notes ?? ''}
+              onChange={e => setState(s => ({ ...s, notes: e.target.value }))}
+              className="px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-300 outline-none bg-white"
+              placeholder="Extra context"
+            />
+          </label>
+        </div>
       </section>
 
       <div className="flex justify-between pt-2">
