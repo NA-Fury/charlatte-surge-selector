@@ -4,6 +4,7 @@ import { useMemo, useState, Suspense } from 'react';
 import { capsuleVolumeLitres, litresToUsGallons } from '../lib/sizing';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThreeVessel from '../components/ThreeVessel';
+// NOTE: ThreeVessel is already wrapped in a Suspense boundary below for lazy loading
 import { useTranslation } from '../lib/i18n';
 import { useTheme } from '../lib/theme';
 

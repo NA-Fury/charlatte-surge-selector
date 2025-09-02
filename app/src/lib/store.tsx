@@ -31,6 +31,14 @@ export interface FormState {
   phone?: string;
   notes?: string;
   otherMediaNote?: string;
+
+  // Project Info (Page 2)
+  operationType?: 'Pumping' | 'Gravity';
+  requireSurgeProtection?: boolean; // Q2
+  surgeAnalysisDone?: 'Yes' | 'No' | 'Unsure'; // Q2 a-1
+  pressureBoosting?: boolean; // Q3
+  pipelineContinuous?: boolean; // Q4a
+  pipelineFlat?: boolean; // Q4b
 }
 
 const Ctx = createContext<{

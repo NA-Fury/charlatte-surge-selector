@@ -2,11 +2,15 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { Transition } from 'framer-motion';
 import Stepper from './components/Stepper';
-import Application from './routes/Application';
-import Config from './routes/Config';
-import Sizing from './routes/Sizing';
-import Summary from './routes/Summary';
-import Contact from './routes/Contact';
+import { lazy, Suspense } from 'react';
+
+const Application = lazy(() => import('./routes/Application'));
+const ProjectInfo = lazy(() => import('./routes/ProjectInfo'));
+const Designer = lazy(() => import('./routes/Designer'));
+const Config = lazy(() => import('./routes/Config'));
+const Sizing = lazy(() => import('./routes/Sizing'));
+const Summary = lazy(() => import('./routes/Summary'));
+const Contact = lazy(() => import('./routes/Contact'));
 import { useTranslation } from './lib/i18n';
 import { useTheme } from './lib/theme';
 
@@ -122,15 +126,20 @@ export default function App() {
               boxShadow: theme.shadow
             }}
           >
-            <Routes>
-              <Route path="/" element={<Navigate to="/application" replace />} />
-              <Route path="/application" element={<Application />} />
-              <Route path="/config" element={<Config />} />
-              <Route path="/sizing" element={<Sizing />} />
-              <Route path="/summary" element={<Summary />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="*" element={<Navigate to="/application" replace />} />
-            </Routes>
+            <Suspense fallback={<div>Loading…</div>}>
+              <Routes>
+                <Route path="/" element={<Navigate to="/application" replace />} />
+                <Route path="/application" element={<Application />} />
+                <Route path="/project" element={<ProjectInfo />} />
+                <Route path="/designer" element={<Designer />} />
+                {/* Legacy routes still available */}
+                <Route path="/config" element={<Config />} />
+                <Route path="/sizing" element={<Sizing />} />
+                <Route path="/summary" element={<Summary />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="*" element={<Navigate to="/application" replace />} />
+              </Routes>
+            </Suspense>
           </motion.section>
         </AnimatePresence>
       </main>

@@ -2,8 +2,8 @@ import { useLocation, Link } from 'react-router-dom';
 
 const steps = [
   { to: '/application', label: 'Application' },
-  { to: '/config', label: 'Surge Vessel Selection' },
-  { to: '/sizing', label: 'Sizing' },
+  { to: '/project', label: 'Project Information' },
+  { to: '/designer', label: 'Design (Selector + Sizing)' },
   { to: '/summary', label: 'Summary' },
   { to: '/contact', label: 'Contact' },
 ];

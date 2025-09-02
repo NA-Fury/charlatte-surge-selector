@@ -351,6 +351,125 @@ const translations = {
   }
 };
 
+// Normalize French accents (fix encoding issues in source literals)
+// Only overrides visible UI strings without changing structure
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const fr: any = (translations as any).fr;
+if (fr) {
+  fr.app.subtitle = 'Sélecteur de Réservoir Anti-bélier';
+  fr.app.version = 'Édition Professionnelle';
+  fr.steps.summary = 'Résumé';
+  fr.application.title = 'Média / Application';
+  fr.application.subtitle = 'Pour quelle application ou média utiliserez-vous ce produit ?';
+  fr.application.media.CleanWater = 'Eau propre';
+  fr.application.media.Potable = 'Eau potable';
+  fr.application.media.TSE = "Effluent d'égout traité";
+  fr.application.media.NoSolids = 'Média sans solides';
+  fr.application.media.Sewage = 'Égout';
+  fr.application.media.WasteWater = 'Eaux usées';
+  fr.application.media.Solids = 'Média avec solides';
+  fr.application.descriptions.CleanWater = "Pour les systèmes d'eau propre municipaux et industriels";
+  fr.application.descriptions.Potable = "Systèmes conformes à l'eau potable";
+  fr.application.descriptions.TSE = "Applications d'eau recyclée";
+  fr.application.descriptions.Sewage = 'Égouts bruts et eaux usées';
+  fr.application.descriptions.WasteWater = 'Eaux usées industrielles et municipales';
+  fr.configuration.subtitle = "Sélectionnez la technologie et l'orientation pour votre application";
+  fr.configuration.specialRequirements = 'Exigences spéciales';
+  fr.configuration.araaQuestion = 'Minimum 1-2 démarrages/arrêts de pompe par jour avec pipeline relativement plat ?';
+  fr.configuration.araaNote = "(Pas d'alimentation électrique impliquée)";
+  fr.configuration.araaSelected = 'Technologie ARAA sélectionnée - Configuration verticale uniquement';
+  fr.configuration.products.Hydrochoc.tagline = "Réservoir à vessie pour applications d'eau potable";
+  fr.configuration.products.Hydrochoc.features = [
+    'Protection anti-bélier',
+    'Conception eau dans vessie',
+    "Horizontal jusqu'à 120 000 litres",
+    "Vertical jusqu'à 60 000 litres",
+  ];
+  fr.configuration.products.Hydrofort.tagline = "Réservoir à vessie pour eau potable ou industrielle";
+  fr.configuration.products.Hydrofort.features = [
+    "Contrôle du cycle de pompe/stockage d'eau",
+    'Conception eau dans vessie',
+    "Horizontal jusqu'à 120 000 litres",
+    "Vertical jusqu'à 60 000 litres",
+  ];
+  fr.configuration.products.EUV.tagline = "Réservoir à vessie pour eaux usées et eau brute";
+  fr.configuration.products.EUV.features = [
+    'Pour protection anti-bélier',
+    'Applications avec sédimentation importante',
+    'Conception air dans vessie',
+    "Vertical uniquement, jusqu'à 60 000 litres",
+  ];
+  fr.configuration.products.ARAA.tagline = 'Réservoir style tube plongeur';
+  fr.configuration.products.ARAA.features = [
+    'Pour protection anti-bélier',
+    'Conception sans vessie',
+    'Basse pression avec hauteur statique nulle',
+    "Vertical uniquement, jusqu'à 80 000 litres",
+  ];
+  fr.configuration.products.Compressor.name = 'COMPRESSEUR';
+  fr.configuration.products.Compressor.tagline = 'Package complet de protection anti-bélier';
+  fr.configuration.products.Compressor.features = [
+    'Protection anti-bélier et contrôle du cycle de pompe',
+    'Package complet avec panneau de contrôle',
+    'Configuration verticale ou horizontale',
+    "Toutes applications d'eau",
+  ];
+  fr.sizing.title = 'Dimensionnement du Réservoir';
+  fr.sizing.subtitle = 'Configurez les dimensions ou la capacité de votre réservoir anti-bélier';
+  fr.sizing.dimensionsKnown = 'Dimensions connues';
+  fr.sizing.capacityKnown = 'Capacité connue';
+  fr.sizing.diameter = 'Diamètre';
+  fr.sizing.length = 'Longueur totale';
+  fr.sizing.capacity = 'Capacité';
+  fr.sizing.volumeGallons = 'Volume (Gallons US)';
+  fr.sizing.autoCalculate = "Les dimensions seront calculées automatiquement selon la technologie et l'orientation";
+  fr.sizing.show3D = 'Afficher la visualisation 3D';
+  fr.sizing.surgeAnalysisTitle = 'Analyse anti-bélier professionnelle requise';
+  fr.sizing.surgeAnalysisDesc = 'Pour un dimensionnement précis et un devis final, une analyse anti-bélier complète est requise.';
+  fr.sizing.downloadForm = 'Télécharger le formulaire AQ120';
+  fr.summary.title = 'Résumé professionnel';
+  fr.summary.subtitle = 'Vérifiez la configuration de votre réservoir anti-bélier';
+  fr.summary.media = 'Média';
+  fr.summary.capacity = 'Capacité';
+  fr.summary.diameter = 'Diamètre';
+  fr.summary.length = 'Longueur';
+  fr.summary.quoteRequirements = 'Exigences pour devis final';
+  fr.summary.requirements = [
+    'Quantité / Nombre de produits',
+    'Pression de conception',
+    'Code de fabrication (ASME, EN, etc.)',
+    'Exigences U-Stamp (si ASME)',
+    'Exigences TPI',
+    'Courbes de pompe',
+    'Profils de pipeline',
+    'Détails de débit',
+  ];
+  fr.contact.title = 'Contact et demande de devis';
+  fr.contact.subtitle = 'Complétez vos informations pour recevoir un devis détaillé';
+  fr.contact.fields.name = 'Nom complet';
+  fr.contact.fields.email = 'Adresse e-mail';
+  fr.contact.fields.phone = 'Numéro de téléphone';
+  fr.contact.fields.company = 'Entreprise / Organisation';
+  fr.contact.fields.country = 'Pays / Région';
+  fr.contact.fields.notes = 'Exigences supplémentaires / Questions';
+  fr.contact.manufacturingStandards = 'Normes de fabrication';
+  fr.contact.manufacturingCode = 'Code de fabrication';
+  fr.contact.uStamp = 'U-Stamp ASME requis ?';
+  fr.contact.tpi = 'Inspecteur tiers (TPI) ?';
+  fr.contact.attachments = 'Pièces jointes';
+  fr.contact.attachmentTypes = 'Courbes de pompe, profils de pipeline, spécifications (PDF, Excel, CAD)';
+  fr.contact.whatNext = 'Que se passe-t-il ensuite ?';
+  fr.contact.nextSteps = [
+    'Votre demande sera envoyée à notre département hydraulique',
+    'Un spécialiste technique examinera vos exigences',
+    'Vous recevrez un devis détaillé dans les 24-48 heures',
+    'Optionnel : Planifier une consultation pour discuter de votre projet',
+  ];
+  fr.contact.submitButton = 'Soumettre la demande de devis';
+  fr.contact.downloadPDF = 'Télécharger le résumé PDF';
+  fr.contact.submissionSuccess = 'Merci ! Votre demande a été soumise. Notre département hydraulique examinera vos exigences et vous contactera sous 24-48 heures.';
+}
+
 interface TranslationContextType {
   t: (key: string) => string;
   language: Language;
