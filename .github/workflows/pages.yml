@@ -29,6 +29,8 @@ jobs:
       - run: npm ci
       - run: echo "VITE_DEMO=1" > .env.demo
       - run: npm run build
+      # SPA fallback so direct deep-links like /aq10 work on GitHub Pages
+      - run: cp dist/index.html dist/404.html
       - run: touch dist/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
