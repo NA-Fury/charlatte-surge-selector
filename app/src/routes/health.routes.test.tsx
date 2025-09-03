@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import App from '../../App';
+import App from '../App';
 import { ThemeProvider } from '../lib/theme';
 import { TranslationProvider } from '../lib/i18n';
 import { Provider } from '../lib/store';
@@ -40,4 +40,3 @@ describe('routes health check', () => {
     expect(await screen.findByText(/Design\s*&\s*Sizing/i)).toBeInTheDocument();
   });
 });
-
