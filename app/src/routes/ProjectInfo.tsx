@@ -174,13 +174,13 @@ export default function ProjectInfo() {
             <div className="flex flex-wrap gap-3 mt-4">
               <button
                 type="button"
-                onClick={() => window.open('/aq10', '_blank')}
+                onClick={() => window.open(`${import.meta.env.BASE_URL}aq10`, '_blank')}
                 className="px-4 py-2 rounded-lg text-xs font-medium bg-blue-600 text-white shadow hover:bg-blue-700 transition"
               >
                 Open Digital AQ10
               </button>
               <a
-                href="/aq10"
+                href={`${import.meta.env.BASE_URL}aq10`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-4 py-2 rounded-lg text-xs font-medium border border-blue-400 text-blue-700 bg-white/70 hover:bg-white transition"
@@ -189,7 +189,7 @@ export default function ProjectInfo() {
               </a>
               <button
                 type="button"
-                onClick={() => window.open('/aq10?blank=1', '_blank')}
+                onClick={() => window.open(`${import.meta.env.BASE_URL}aq10?blank=1`, '_blank')}
                 className="px-4 py-2 rounded-lg text-xs font-medium border border-blue-300 text-blue-600 bg-white/50 hover:bg-white transition"
               >
                 Blank Template
