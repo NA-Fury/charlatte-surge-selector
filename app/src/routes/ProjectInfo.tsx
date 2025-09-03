@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../lib/store';
 import { Droplet, Gauge, LineChart, Ruler, Info } from 'lucide-react';
-import { useState } from 'react';
 
 function Help({ text }: { text: string }) {
   return (

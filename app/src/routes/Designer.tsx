@@ -15,7 +15,7 @@ const LIMITS: Record<Tech, { byOrientation: Record<Orientation, number>; pressur
   Hydrofort: { byOrientation: { Horizontal: 125000, Vertical: 80000 }, pressure: '100 bar' },
   Compressor: { byOrientation: { Horizontal: 125000, Vertical: 125000 }, pressure: '100 bar' },
   ARAA: { byOrientation: { Horizontal: 60000, Vertical: 60000 }, pressure: '1 atm' },
-  EUV: { byOrientation: { Horizontal: 60000, Vertical: 60000 }, pressure: '30 bar' },
+  EUV: { byOrientation: { Horizontal: 60000, Vertical: 60000 }, pressure: '1 atm' },
 };
 
 type ProductMeta = {
@@ -179,7 +179,16 @@ function FlipCard({
               </ul>
             </div>
           </div>
-          <div className="flex justify-end pt-2">
+          <div className="flex justify-between pt-2">
+            <button
+              type="button"
+              disabled={greyed}
+              onClick={!greyed ? onSelect : undefined}
+              className={`px-3 py-1.5 rounded-lg text-[11px] font-medium border
+                ${greyed ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-50'} transition`}
+            >
+              Select
+            </button>
             <button
               type="button"
               disabled={greyed}
@@ -701,3 +710,4 @@ export default function Designer() {
     </div>
   );
 }
+

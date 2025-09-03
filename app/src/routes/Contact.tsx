@@ -80,6 +80,8 @@ export default function Contact() {
     await generatePDF(pdfData);
   };
 
+  // Optional: AQ10 re-download handled from Summary page
+
   const handleSubmit = async () => {
     if (!validateForm()) return;
     
@@ -403,3 +405,5 @@ export default function Contact() {
     </motion.div>
   );
 }
+
+

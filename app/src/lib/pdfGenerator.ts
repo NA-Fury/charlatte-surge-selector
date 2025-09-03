@@ -1,6 +1,6 @@
 import { jsPDF } from 'jspdf';
 
-interface PDFData {
+export interface PDFData {
   // Configuration
   media?: string;
   tech?: string;
@@ -10,6 +10,13 @@ interface PDFData {
   capacityGallons?: number;
   diameterMm?: number;
   lengthMm?: number;
+  // Project Info
+  operationType?: 'Pumping' | 'Gravity';
+  requireSurgeProtection?: boolean;
+  surgeAnalysisDone?: 'Yes' | 'No' | 'Unsure';
+  pressureBoosting?: boolean;
+  pipelineContinuous?: boolean;
+  pipelineFlat?: boolean;
   // Contact
   name?: string;
   email?: string;
@@ -122,6 +129,15 @@ export async function generatePDF(data: PDFData): Promise<void> {
   addField('Media/Application', data.media);
   addField('Technology', data.tech);
   addField('Orientation', data.orientation);
+  
+  // Project Info
+  addSection('Project Information');
+  if (data.operationType) addField('Operation Type', data.operationType);
+  if (typeof data.requireSurgeProtection === 'boolean') addField('Surge Protection', data.requireSurgeProtection ? 'Yes' : 'No');
+  if (data.requireSurgeProtection && data.surgeAnalysisDone) addField('Surge Analysis Done', data.surgeAnalysisDone);
+  if (typeof data.pressureBoosting === 'boolean') addField('Pressure Boosting', data.pressureBoosting ? 'Yes' : 'No');
+  if (typeof data.pipelineContinuous === 'boolean') addField('Continuous Operation', data.pipelineContinuous ? 'Yes' : 'No');
+  if (typeof data.pipelineFlat === 'boolean') addField('Pipeline Relatively Flat', data.pipelineFlat ? 'Yes' : 'No');
   
   // Dimensions
   addSection('Dimensions & Capacity');

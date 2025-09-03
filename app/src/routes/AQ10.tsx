@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useStore } from '../lib/store';
 import { generatePDF, generateBlankAQ10PDF } from '../lib/pdfGenerator';
-import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, FileDown, ArrowLeft, Save, Download, ClipboardList } from 'lucide-react';
 
@@ -406,4 +405,3 @@ export default function AQ10() {
     </div>
   );
 }
-
