@@ -32,6 +32,7 @@ jobs:
       # SPA fallback so direct deep-links like /aq10 work on GitHub Pages
       - run: cp dist/index.html dist/404.html
       - run: touch dist/.nojekyll
+      - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: app/dist
