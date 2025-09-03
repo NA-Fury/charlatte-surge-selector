@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useStore } from '../lib/store';
-import { generatePDF, renderPDF } from '../lib/pdfGenerator';
+import { generatePDF, renderPDF, type PDFData } from '../lib/pdfGenerator';
 import { litresToUsGallons } from '../lib/sizing';
 
 function useQuery() {
@@ -34,7 +34,9 @@ export default function Submitted() {
             notes: `${aq.notes || ''} | Pipeline Length (km): ${aq.pipelineLengthKm ?? '-'}`,
             generatedAt: new Date().toISOString(),
           }, { download: false, filename: 'Charlatte_AQ10.pdf' });
-        } catch {}
+        } catch (err) {
+          console.warn('AQ10 PDF render failed', err);
+        }
       }
 
       const fd = new FormData();
@@ -57,7 +59,15 @@ export default function Submitted() {
       <h1 className="text-2xl font-semibold">Submission Received</h1>
       <p className="text-slate-600">Reference: <span className="font-mono">{ref}</span></p>
       <div className="flex gap-3 flex-wrap">
-        <button onClick={() => generatePDF({ ...state, capacityGallons: state.capacityLitres ? litresToUsGallons(state.capacityLitres) : 0, generatedAt: new Date().toISOString() } as any)} className="px-4 py-2 rounded-lg border">Download Summary PDF</button>
+        <button
+          onClick={() => {
+            const pdfData = { ...state, capacityGallons: state.capacityLitres ? litresToUsGallons(state.capacityLitres) : 0, generatedAt: new Date().toISOString() } as unknown as PDFData;
+            void generatePDF(pdfData);
+          }}
+          className="px-4 py-2 rounded-lg border"
+        >
+          Download Summary PDF
+        </button>
         <button onClick={resend} className="px-4 py-2 rounded-lg bg-blue-600 text-white">Resend Email</button>
         <button onClick={() => nav('/application')} className="px-4 py-2 rounded-lg border">Back to Start</button>
       </div>
