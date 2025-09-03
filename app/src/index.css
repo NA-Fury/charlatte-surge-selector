@@ -1,3 +1,16 @@
 /* index.css */
 @import "tailwindcss";
 
+/* Brand adapter defaults */
+:root {
+  font-family: var(--surge-font-sans, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif);
+}
+
+h1, h2, h3, .heading {
+  font-family: var(--surge-font-heading, var(--surge-font-sans, inherit));
+}
+
+/* Utility to opt-in host theme detection (if embedding) */
+[data-charlatte-theme] {
+  /* acts as a detector only; actual variables are read by ThemeProvider */
+}

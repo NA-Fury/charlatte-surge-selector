@@ -20,6 +20,10 @@ interface Theme {
   textSecondary: string;
   textInverse: string;
   
+  // Typography
+  fontSans?: string;
+  fontHeading?: string;
+  
   // Borders
   borderColor: string;
   
@@ -42,6 +46,8 @@ const defaultTheme: Theme = {
   textPrimary: '#0f172a',
   textSecondary: '#64748b',
   textInverse: '#ffffff',
+  fontSans: 'Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
+  fontHeading: 'Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
   
   borderColor: '#e2e8f0',
   
@@ -63,6 +69,8 @@ const charlatteTheme: Theme = {
   textPrimary: '#172B4D',
   textSecondary: '#5E6C84',
   textInverse: '#FFFFFF',
+  fontSans: 'Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
+  fontHeading: 'Montserrat, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
   
   borderColor: '#DFE1E6',
   
@@ -112,6 +120,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       { cssVar: '--text-muted', themeKey: 'textSecondary' },
       { cssVar: '--border-color', themeKey: 'borderColor' },
       { cssVar: '--divider-color', themeKey: 'borderColor' },
+      // Fonts
+      { cssVar: '--font-sans', themeKey: 'fontSans' },
+      { cssVar: '--font-family-sans', themeKey: 'fontSans' },
+      { cssVar: '--font-family-base', themeKey: 'fontSans' },
+      { cssVar: '--font-heading', themeKey: 'fontHeading' },
+      { cssVar: '--font-family-heading', themeKey: 'fontHeading' },
     ];
 
     for (const { cssVar, themeKey } of varMappings) {
@@ -163,7 +177,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const root = document.documentElement;
     
-    (Object.entries(theme) as Array<[keyof Theme, string]>).forEach(([k, v]) => {
+    (Object.entries(theme) as Array<[keyof Theme, string | undefined]>).forEach(([k, v]) => {
       if (typeof v === 'string') {
         const cssVarName = `--surge-${k.replace(/([A-Z])/g, '-$1').toLowerCase()}`;
         root.style.setProperty(cssVarName, v);

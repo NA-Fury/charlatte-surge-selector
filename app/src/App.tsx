@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import type { Transition } from 'framer-motion';
 import Stepper from './components/Stepper';
 import { lazy, Suspense } from 'react';
+import BrandLogo from './components/BrandLogo';
 
 const Application = lazy(() => import('./routes/Application'));
 const ProjectInfo = lazy(() => import('./routes/ProjectInfo'));
@@ -55,25 +56,13 @@ export default function App() {
           }}
         >
           <div className="mx-auto max-w-6xl p-4 flex items-center justify-between">
-            <motion.div 
-              className="flex items-center gap-3"
-              whileHover={{ scale: 1.02 }}
-            >
-              <div 
-                className="p-2 rounded-lg shadow-lg"
-                style={{ 
-                  background: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})` 
-                }}
-              >
-                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
-              </div>
+            <motion.div className="flex items-center gap-3" whileHover={{ scale: 1.02 }}>
+              <BrandLogo height={28} />
               <div>
-                <div className="font-bold text-lg" style={{ color: theme.primary }}>
-                  CHARLATTE RESERVOIRS
+                <div className="font-bold text-lg" style={{ color: theme.primary, fontFamily: 'var(--surge-font-heading)' }}>
+                  CHARLATTE RÉSERVOIRS
                 </div>
-                <div className="text-xs opacity-60">
+                <div className="text-xs opacity-60" style={{ fontFamily: 'var(--surge-font-sans)' }}>
                   {t('app.subtitle')}
                 </div>
               </div>
@@ -91,7 +80,7 @@ export default function App() {
                   color: theme.textSecondary
                 }}
               >
-                {language === 'en' ? '🇫🇷 FR' : '🇬🇧 EN'}
+                {language === 'en' ? 'FR' : 'EN'}
               </motion.button>
               
               <div className="text-sm opacity-60">
