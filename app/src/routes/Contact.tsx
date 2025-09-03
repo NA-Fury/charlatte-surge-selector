@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from '../lib/i18n';
 import { useTheme } from '../lib/theme';
-import { generatePDF } from '../lib/pdfGenerator';
+import { generatePDF, renderPDF } from '../lib/pdfGenerator';
 import { litresToUsGallons } from '../lib/sizing';
 
 type Code = 'ASME' | 'EN' | 'CODAP' | 'AS1210' | 'PD5500';
@@ -90,15 +90,85 @@ export default function Contact() {
     // Update state with form data
     setState(s => ({ ...s, ...form }));
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Generate and download PDF
-    await handleDownloadPDF();
-    
-    setIsSubmitting(false);
-    alert(t('contact.submissionSuccess'));
-    nav('/application');
+    try {
+      // Generate PDFs
+      const summaryBlob = await renderPDF({
+        ...state,
+        ...form,
+        capacityGallons: state.capacityLitres ? litresToUsGallons(state.capacityLitres) : 0,
+        generatedAt: new Date().toISOString(),
+      }, { download: false, filename: 'Charlatte_Summary.pdf' });
+
+      // Optional AQ10
+      let aq10Blob: Blob | undefined;
+      if (typeof window !== 'undefined') {
+        const raw = localStorage.getItem('aq10Data');
+        if (raw) {
+          try {
+            const aq = JSON.parse(raw);
+            aq10Blob = await renderPDF({
+              name: 'AQ10 Intake',
+              company: aq.projectName || 'Project',
+              notes: `${aq.notes || ''} | Pipeline Length (km): ${aq.pipelineLengthKm ?? '-'}`,
+              generatedAt: new Date().toISOString(),
+            }, { download: false, filename: 'Charlatte_AQ10.pdf' });
+          } catch {
+            // ignore parse errors
+          }
+        }
+      }
+
+      // Email via Formspree (recommended for static Pages)
+      const formspreeId = (import.meta.env.VITE_FORMSPREE_ID as string | undefined) ?? 'xvgbvgjr';
+      if (formspreeId) {
+        const fd = new FormData();
+        fd.append('name', form.name);
+        fd.append('email', form.email);
+        fd.append('phone', form.phone);
+        fd.append('company', form.company);
+        fd.append('country', form.country);
+        fd.append('notes', form.notes);
+        fd.append('_subject', 'Charlatte Selector – New Submission');
+        // Ensure replies go to the user who submitted the form
+        fd.append('_replyto', form.email);
+        fd.append('meta', JSON.stringify({
+          media: state.media,
+          tech: state.tech,
+          orientation: state.orientation,
+          capacityLitres: state.capacityLitres,
+          diameterMm: state.diameterMm,
+          lengthMm: state.lengthMm,
+          operationType: state.operationType,
+          requireSurgeProtection: state.requireSurgeProtection,
+          surgeAnalysisDone: state.surgeAnalysisDone,
+          pressureBoosting: state.pressureBoosting,
+          pipelineContinuous: state.pipelineContinuous,
+          pipelineFlat: state.pipelineFlat,
+        }));
+        fd.append('summary', new File([summaryBlob], 'Charlatte_Summary.pdf', { type: 'application/pdf' }));
+        if (aq10Blob) {
+          fd.append('aq10', new File([aq10Blob], 'Charlatte_AQ10.pdf', { type: 'application/pdf' }));
+        }
+
+        const res = await fetch(`https://formspree.io/f/${formspreeId}`, {
+          method: 'POST',
+          body: fd,
+          headers: { Accept: 'application/json' },
+        });
+        if (!res.ok) throw new Error('Email send failed');
+      }
+
+      // Always download a local copy for the user
+      await handleDownloadPDF();
+
+      alert(t('contact.submissionSuccess'));
+      nav('/application');
+    } catch (e) {
+      console.error(e);
+      alert('Submission partially failed to send via email. Your PDF was downloaded locally.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const formFields = [
@@ -405,5 +475,3 @@ export default function Contact() {
     </motion.div>
   );
 }
-
-

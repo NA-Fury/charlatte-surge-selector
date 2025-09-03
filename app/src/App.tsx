@@ -15,6 +15,8 @@ const Contact = lazy(() => import('./routes/Contact'));
 const AQ10 = lazy(() => import('./routes/AQ10'));
 import { useTranslation } from './lib/i18n';
 import { useTheme } from './lib/theme';
+import { useEffect } from 'react';
+import { trackPageview } from './lib/analytics';
 
 const pageVariants = {
   initial: { opacity: 0, x: 20 },
@@ -35,6 +37,10 @@ export default function App() {
   const location = useLocation();
   const { t, language, setLanguage } = useTranslation();
   const { theme } = useTheme();
+
+  useEffect(() => {
+    trackPageview(location.pathname + location.search);
+  }, [location.pathname, location.search]);
 
   return (
     <div 
@@ -137,7 +143,6 @@ export default function App() {
     </div>
   );
 }
-
 
 
 

@@ -6,6 +6,9 @@ import { Provider } from './lib/store';
 import { TranslationProvider } from './lib/i18n';
 import { ThemeProvider } from './lib/theme';
 import './index.css';
+import { initAnalytics } from './lib/analytics';
+
+if (typeof window !== 'undefined') initAnalytics();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

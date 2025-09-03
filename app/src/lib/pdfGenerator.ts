@@ -59,7 +59,10 @@ export interface PDFData {
   checkedSignedAtISO?: string;
 }
 
-export async function generatePDF(data: PDFData): Promise<void> {
+export async function renderPDF(
+  data: PDFData,
+  options?: { download?: boolean; filename?: string }
+): Promise<Blob> {
   const doc = new jsPDF();
   let yPos = 20;
   const lineHeight = 7;
@@ -306,9 +309,21 @@ export async function generatePDF(data: PDFData): Promise<void> {
     addField('Checked / Signed At', data.checkedSignedAtISO ? new Date(data.checkedSignedAtISO).toLocaleString() : undefined);
   }
   
-  // Save the PDF
-  const filename = `Charlatte_Surge_Vessel_${data.company?.replace(/\s+/g, '_') || 'Quote'}_${new Date().toISOString().split('T')[0]}.pdf`;
-  doc.save(filename);
+  // Output / Save
+  const filename =
+    options?.filename ||
+    `Charlatte_Surge_Vessel_${data.company?.replace(/\s+/g, '_') || 'Quote'}_${new Date()
+      .toISOString()
+      .split('T')[0]}.pdf`;
+  const blob = doc.output('blob');
+  if (options?.download !== false) {
+    doc.save(filename);
+  }
+  return blob;
+}
+
+export async function generatePDF(data: PDFData): Promise<void> {
+  await renderPDF(data, { download: true });
 }
 
 // Helper to export a BLANK AQ10 template quickly
