@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../lib/store';
-import { Info, Droplet, Gauge, LineChart, Ruler, Activity } from 'lucide-react';
+import { Info, Droplet, Gauge, LineChart, Ruler } from 'lucide-react';
 
 function Help({ text }: { text: string }) {
   return (

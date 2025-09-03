@@ -12,15 +12,31 @@ export type Tech =
   | 'EUV'
   | 'ARAA'
   | 'Compressor';
+
 export type Orientation = 'Horizontal' | 'Vertical';
 
 export interface FormState {
   media?: Media;
   tech?: Tech;
   orientation?: Orientation;
+  
+  // Designer / sizing data
   capacityLitres?: number;
   diameterMm?: number;
   lengthMm?: number;
+
+  // Project info logic fields
+  operationType?: 'Pumping' | 'Gravity';
+  requireSurgeProtection?: boolean;
+  surgeAnalysisDone?: 'Yes' | 'No';
+  pressureBoosting?: boolean;
+  pipelineContinuous?: boolean;
+  pipelineFlat?: boolean;
+
+  designPressureBar?: number;
+  pipelineLengthM?: number;
+  notes?: string;
+
   code?: 'ASME' | 'EN' | 'CODAP' | 'AS1210' | 'PD5500';
   uStamp?: boolean;
   tpi?: boolean;
@@ -29,19 +45,7 @@ export interface FormState {
   company?: string;
   country?: string;
   phone?: string;
-  notes?: string;
   otherMediaNote?: string;
-
-  operationType?: 'Pumping' | 'Gravity';
-  requireSurgeProtection?: boolean;
-  surgeAnalysisDone?: 'Yes' | 'No'; // removed 'Unsure'
-  pressureBoosting?: boolean;
-  pipelineContinuous?: boolean;
-  pipelineFlat?: boolean;
-
-  // New extra project details
-  designPressureBar?: number;
-  pipelineLengthM?: number;
 }
 
 const Ctx = createContext<{
