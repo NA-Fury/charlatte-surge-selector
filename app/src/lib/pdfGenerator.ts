@@ -5,13 +5,11 @@ interface PDFData {
   media?: string;
   tech?: string;
   orientation?: string;
-  
   // Dimensions
   capacityLitres?: number;
   capacityGallons?: number;
   diameterMm?: number;
   lengthMm?: number;
-  
   // Contact
   name?: string;
   email?: string;
@@ -19,14 +17,39 @@ interface PDFData {
   company?: string;
   country?: string;
   notes?: string;
-  
   // Manufacturing
   code?: string;
   uStamp?: boolean;
   tpi?: boolean;
-  
   // Metadata
   generatedAt?: string;
+  // --- AQ10 payload (optional) ---
+  enquiryRef?: string;
+  enquiryDateISO?: string;
+  inquiryType?: 'Study' | 'Estimation';
+  fluidOtherSpec?: string;
+  tmh?: number;
+  tmhZeroFlow?: number;
+  surgeVesselElevationM?: number;
+  flowMaxM3h?: number;
+  flowMinM3h?: number;
+  suctionMinElevM?: number;
+  suctionMaxElevM?: number;
+  pipelineLengthM?: number;
+  pipelineIntDiamMm?: number;
+  pipelineMaterial?: string;
+  profileDescription?: string;
+  profileCumulativeDistance?: string;
+  profileElevation?: string;
+  profileAirValves?: string;
+  endOfPipeDescription?: string;
+  siteConditions?: string;
+  speedRotationRpm?: number;
+  momentInertiaKgM2?: number;
+  pumpsInOperation?: number;
+  checkedByName?: string;
+  checkedByCompany?: string;
+  checkedSignedAtISO?: string;
 }
 
 export async function generatePDF(data: PDFData): Promise<void> {
@@ -236,7 +259,50 @@ export async function generatePDF(data: PDFData): Promise<void> {
     yPos += 8;
   });
   
+  // Insert AQ10 section if enquiryRef present
+  if (data.enquiryRef) {
+    addSection('AQ10 – Surge / Transient Study Intake');
+    addField('Enquiry Reference', data.enquiryRef);
+    addField('Enquiry Date', data.enquiryDateISO ? new Date(data.enquiryDateISO).toLocaleDateString() : undefined);
+    addField('Inquiry Type', data.inquiryType);
+    addField('Nature of Fluid', data.media);
+    addField('Other Fluid Spec', data.fluidOtherSpec);
+    addField('TMH', data.tmh !== undefined ? `${data.tmh} Wc` : undefined);
+    addField('TMH @ Zero Flow', data.tmhZeroFlow !== undefined ? `${data.tmhZeroFlow} m.Wc` : undefined);
+    addField('Surge Vessel Elevation', data.surgeVesselElevationM !== undefined ? `${data.surgeVesselElevationM} m` : undefined);
+    addField('Max Flow', data.flowMaxM3h !== undefined ? `${data.flowMaxM3h} m³/h` : undefined);
+    addField('Min Flow', data.flowMinM3h !== undefined ? `${data.flowMinM3h} m³/h` : undefined);
+    addField('Suction Elev (Min)', data.suctionMinElevM !== undefined ? `${data.suctionMinElevM} m` : undefined);
+    addField('Suction Elev (Max)', data.suctionMaxElevM !== undefined ? `${data.suctionMaxElevM} m` : undefined);
+    addField('Pipeline Length', data.pipelineLengthM !== undefined ? `${data.pipelineLengthM} m` : undefined);
+    addField('Pipeline Int Diam', data.pipelineIntDiamMm !== undefined ? `${data.pipelineIntDiamMm} mm` : undefined);
+    addField('Pipeline Material', data.pipelineMaterial);
+    addField('Speed of Rotation', data.speedRotationRpm !== undefined ? `${data.speedRotationRpm} tr/min` : undefined);
+    addField('Moment of Inertia', data.momentInertiaKgM2 !== undefined ? `${data.momentInertiaKgM2} kg·m²` : undefined);
+    addField('Pumps in Operation', data.pumpsInOperation !== undefined ? String(data.pumpsInOperation) : undefined);
+    addField('End of Pipe Description', data.endOfPipeDescription);
+    addField('Site Conditions', data.siteConditions);
+    addField('Profile (Cumulative Distance)', data.profileCumulativeDistance);
+    addField('Profile (Elevation)', data.profileElevation);
+    addField('Profile (Air Valves / Drain)', data.profileAirValves);
+    addField('Checked By', data.checkedByName);
+    addField('Checked Company', data.checkedByCompany);
+    addField('Checked / Signed At', data.checkedSignedAtISO ? new Date(data.checkedSignedAtISO).toLocaleString() : undefined);
+  }
+  
   // Save the PDF
   const filename = `Charlatte_Surge_Vessel_${data.company?.replace(/\s+/g, '_') || 'Quote'}_${new Date().toISOString().split('T')[0]}.pdf`;
   doc.save(filename);
+}
+
+// Helper to export a BLANK AQ10 template quickly
+export async function generateBlankAQ10PDF(): Promise<void> {
+  await generatePDF({
+    generatedAt: new Date().toISOString(),
+    enquiryRef: 'BLANK-TEMPLATE',
+    enquiryDateISO: new Date().toISOString(),
+    inquiryType: undefined,
+    media: 'Clear / Waste / Other',
+    notes: 'Blank AQ10 template'
+  });
 }

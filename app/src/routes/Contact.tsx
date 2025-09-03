@@ -77,7 +77,6 @@ export default function Contact() {
       capacityGallons: state.capacityLitres ? litresToUsGallons(state.capacityLitres) : 0,
       generatedAt: new Date().toISOString()
     };
-    
     await generatePDF(pdfData);
   };
 
@@ -228,7 +227,7 @@ export default function Contact() {
         </div>
       </motion.div>
 
-      {/* Additional Notes */}
+      {/* Additional Notes (append indication if AQ10 present) */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -236,6 +235,11 @@ export default function Contact() {
       >
         <label className="block text-sm font-medium mb-2">
           {t('contact.fields.notes')}
+          {state.enquiryRef && (
+            <span className="ml-2 text-[11px] px-2 py-0.5 rounded bg-blue-100 text-blue-700">
+              AQ10 Ref: {state.enquiryRef}
+            </span>
+          )}
         </label>
         <textarea
           value={form.notes}
@@ -248,6 +252,11 @@ export default function Contact() {
           rows={4}
           placeholder={t('contact.fields.notesPlaceholder')}
         />
+        {state.inquiryType && (
+          <p className="mt-2 text-[11px] text-slate-500">
+            AQ10 Inquiry Type: {state.inquiryType} • Signed: {state.checkedSignedAtISO ? new Date(state.checkedSignedAtISO).toLocaleString() : '—'}
+          </p>
+        )}
       </motion.div>
 
       {/* File Attachments */}

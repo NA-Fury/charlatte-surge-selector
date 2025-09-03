@@ -167,54 +167,34 @@ export default function ProjectInfo() {
               Need a Surge / Transient Analysis? (AQ10 Intake)
             </h3>
             <p className="text-xs text-blue-800/90 mt-2 leading-relaxed">
-              Not a problem! Charlatte Reservoirs can provide a FREE Surge Vessel Protection Analysis. 
-              Fill out as much information as possible in the digital AQ10 form (opens in a new tab), or download a blank version for manual completion. 
-              Your details will be forwarded to our specialized Hydraulic Engineering Division together with this selector inquiry. 
-              We will follow up with professional recommendations and next steps.
+              Not a problem! Charlatte Reservoirs can provide a FREE Surge Vessel Protection Analysis. Fill out as much information
+              as possible in the digital AQ10 form (opens in a new tab), or download a blank version for manual completion. Your details
+              will be forwarded to our specialized Hydraulic Engineering Division with this selector inquiry. We will follow up with professional
+              recommendations and next steps.
             </p>
-            <ul className="mt-3 text-[11px] text-blue-900 list-disc pl-5 space-y-1">
-              <li>Speeds correct vessel sizing & code / pressure confirmation</li>
-              <li>Identifies critical transient scenarios (pump trips, valve closures)</li>
-              <li>Improves confidence in final CAPEX decisions</li>
-            </ul>
             <div className="flex flex-wrap gap-3 mt-4">
               <button
                 type="button"
-                onClick={() => {
-                  // Lightweight prefill handoff (extend later as needed)
-                  const handoff = {
-                    projectName: state.company || state.name || '',
-                    pipelineLengthKm: state.pipelineLengthM ? state.pipelineLengthM / 1000 : undefined,
-                    notes: state.notes
-                  };
-                  try {
-                    localStorage.setItem('aq10Prefill', JSON.stringify(handoff));
-                  } catch {}
-                  // Navigate to internal AQ10 route
-                  (window as any).open('/aq10', '_blank');
-                }}
-                className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white shadow hover:bg-blue-700 transition"
+                onClick={() => window.open('/aq10', '_blank')}
+                className="px-4 py-2 rounded-lg text-xs font-medium bg-blue-600 text-white shadow hover:bg-blue-700 transition"
               >
                 Open Digital AQ10
               </button>
               <a
-                href="/downloads/AQ10_blank.pdf"
+                href="/aq10"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2 rounded-lg text-sm font-medium border border-blue-400 text-blue-700 bg-white/70 hover:bg-white transition"
+                className="px-4 py-2 rounded-lg text-xs font-medium border border-blue-400 text-blue-700 bg-white/70 hover:bg-white transition"
               >
-                Download Blank PDF
+                Open in Same Tab
               </a>
               <button
                 type="button"
-                onClick={() => update('surgeAnalysisDone', 'Yes')}
-                className="px-4 py-2 rounded-lg text-sm font-medium border border-blue-300 text-blue-600 bg-white/50 hover:bg-white transition"
+                onClick={() => window.open('/aq10?blank=1', '_blank')}
+                className="px-4 py-2 rounded-lg text-xs font-medium border border-blue-300 text-blue-600 bg-white/50 hover:bg-white transition"
               >
-                Mark As Completed
+                Blank Template
               </button>
-            </div>
-            <div className="mt-3 text-[11px] text-blue-700/80">
-              Once completed, click “Mark As Completed” so downstream sizing reflects your analysis status.
             </div>
           </div>
         </section>
