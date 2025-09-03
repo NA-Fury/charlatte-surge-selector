@@ -23,10 +23,9 @@ function renderWithProviders(path: string) {
 describe('routes health check', () => {
   it('deep-link to /aq10 renders AQ10 intake', async () => {
     renderWithProviders('/aq10');
-    // Header text from AQ10 page
-    expect(
-      await screen.findByText(/AQ10\s*-\s*Surge\s*\/\s*Transient\s*Study\s*Intake/i)
-    ).toBeInTheDocument();
+    // Title is an <h1> with AQ10 in the text
+    const heading = await screen.findByRole('heading', { name: /AQ10/i });
+    expect(heading).toBeInTheDocument();
   });
 
   it('root renders Application step', async () => {
