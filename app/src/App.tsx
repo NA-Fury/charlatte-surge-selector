@@ -13,6 +13,7 @@ const Sizing = lazy(() => import('./routes/Sizing'));
 const Summary = lazy(() => import('./routes/Summary'));
 const Contact = lazy(() => import('./routes/Contact'));
 const AQ10 = lazy(() => import('./routes/AQ10'));
+const Submitted = lazy(() => import('./routes/Submitted'));
 import { useTranslation } from './lib/i18n';
 import { useTheme } from './lib/theme';
 import { useEffect } from 'react';
@@ -134,6 +135,7 @@ export default function App() {
                 <Route path="/summary" element={<Summary />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/aq10" element={<AQ10 />} />
+                <Route path="/submitted" element={<Submitted />} />
                 <Route path="*" element={<Navigate to="/application" replace />} />
               </Routes>
             </Suspense>
@@ -143,6 +145,5 @@ export default function App() {
     </div>
   );
 }
-
 
 

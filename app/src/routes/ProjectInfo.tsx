@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../lib/store';
 import { Droplet, Gauge, LineChart, Ruler, Info } from 'lucide-react';
+import { trackEvent } from '../lib/analytics';
 
 function Help({ text }: { text: string }) {
   return (
@@ -74,6 +75,18 @@ export default function ProjectInfo() {
   if (pumping && state.requireSurgeProtection !== true) {
     update('requireSurgeProtection', true);
   }
+
+    const ensureRef = () => {
+    if (!state.enquiryRef) {
+      const ref = `AQ10-${new Date().toISOString().slice(0,10)}-${Math.random()
+        .toString(36)
+        .slice(2, 6)
+        .toUpperCase()}`;
+      setState(s => ({ ...s, enquiryRef: ref, enquiryDateISO: s.enquiryDateISO ?? new Date().toISOString() }));
+      return ref;
+    }
+    return state.enquiryRef;
+  };
 
   return (
     <div className="space-y-8">
@@ -174,7 +187,11 @@ export default function ProjectInfo() {
             <div className="flex flex-wrap gap-3 mt-4">
               <button
                 type="button"
-                onClick={() => window.open(`${import.meta.env.BASE_URL}aq10`, '_blank')}
+                onClick={() => {
+                  const ref = ensureRef();
+                  trackEvent('open_aq10', { ref });
+                  window.open(`${import.meta.env.BASE_URL}aq10`, '_blank');
+                }}
                 className="px-4 py-2 rounded-lg text-xs font-medium bg-blue-600 text-white shadow hover:bg-blue-700 transition"
               >
                 Open Digital AQ10

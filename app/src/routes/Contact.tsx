@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { useTranslation } from '../lib/i18n';
 import { useTheme } from '../lib/theme';
 import { generatePDF, renderPDF } from '../lib/pdfGenerator';
+import { loadRecaptcha, getRecaptchaToken } from '../lib/recaptcha';
+import { trackEvent } from '../lib/analytics';
 import { litresToUsGallons } from '../lib/sizing';
 
 type Code = 'ASME' | 'EN' | 'CODAP' | 'AS1210' | 'PD5500';
@@ -150,19 +152,47 @@ export default function Contact() {
           fd.append('aq10', new File([aq10Blob], 'Charlatte_AQ10.pdf', { type: 'application/pdf' }));
         }
 
-        const res = await fetch(`https://formspree.io/f/${formspreeId}`, {
+        // Optional reCAPTCHA v3
+        const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY as string | undefined;
+        if (siteKey && typeof window !== 'undefined') {
+          await loadRecaptcha(siteKey);
+          const token = await getRecaptchaToken(siteKey, 'contact_submit');
+          if (token) fd.append('g-recaptcha-response', token);
+        }
+
+        let res = await fetch(`https://formspree.io/f/${formspreeId}`, {
           method: 'POST',
           body: fd,
           headers: { Accept: 'application/json' },
         });
-        if (!res.ok) throw new Error('Email send failed');
+        // Fallback: retry without attachments if provider rejects files
+        if (!res.ok) {
+          const fd2 = new FormData();
+          fd2.append('name', form.name);
+          fd2.append('email', form.email);
+          fd2.append('phone', form.phone);
+          fd2.append('company', form.company);
+          fd2.append('country', form.country);
+          fd2.append('notes', form.notes);
+          fd2.append('_replyto', form.email);
+          fd2.append('_subject', 'Charlatte Selector – New Submission (no attachments)');
+          fd2.append('message', 'Attachments could not be delivered due to provider limitations. User copies were downloaded locally.');
+          if (siteKey && typeof window !== 'undefined') {
+            const token = await getRecaptchaToken(siteKey, 'contact_submit');
+            if (token) fd2.append('g-recaptcha-response', token);
+          }
+          res = await fetch(`https://formspree.io/f/${formspreeId}`, { method: 'POST', body: fd2, headers: { Accept: 'application/json' } });
+          if (!res.ok) throw new Error('Email send failed');
+        }
       }
 
       // Always download a local copy for the user
       await handleDownloadPDF();
 
+      const ref = state.enquiryRef || `AQ10-${new Date().toISOString().slice(0,10)}-${Math.random().toString(36).slice(2,6).toUpperCase()}`;
       alert(t('contact.submissionSuccess'));
-      nav('/application');
+      trackEvent('submit_contact', { ref });
+      nav(`/submitted?ref=${encodeURIComponent(ref)}`);
     } catch (e) {
       console.error(e);
       alert('Submission partially failed to send via email. Your PDF was downloaded locally.');

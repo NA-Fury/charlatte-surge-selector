@@ -1,23 +1,33 @@
 export type AnalyticsProvider = 'ga' | 'plausible';
 
+type GtagFn = (...args: unknown[]) => void;
+type PlausibleFn = (event: string, opts?: { u?: string; props?: Record<string, unknown> }) => void;
+
+declare global {
+  interface Window {
+    dataLayer?: unknown[];
+    gtag?: GtagFn;
+    plausible?: PlausibleFn;
+  }
+}
+
 let initialized = false;
 
-export function initAnalytics() {
-  if (initialized) return;
+export function initAnalytics(): void {
+  if (initialized || typeof window === 'undefined') return;
   const provider = import.meta.env.VITE_ANALYTICS_PROVIDER as AnalyticsProvider | undefined;
   if (provider === 'ga') {
     const id = import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined;
     if (!id) return;
-    // gtag script
     const s = document.createElement('script');
     s.async = true;
     s.src = `https://www.googletagmanager.com/gtag/js?id=${id}`;
     document.head.appendChild(s);
-    (window as any).dataLayer = (window as any).dataLayer || [];
-    function gtag(...args: unknown[]) {
-      (window as any).dataLayer.push(args);
-    }
-    (window as any).gtag = gtag;
+    window.dataLayer = window.dataLayer || [];
+    const gtag: GtagFn = (...args) => {
+      window.dataLayer!.push(args);
+    };
+    window.gtag = gtag;
     gtag('js', new Date());
     gtag('config', id);
     initialized = true;
@@ -33,12 +43,20 @@ export function initAnalytics() {
   }
 }
 
-export function trackPageview(path: string) {
+export function trackPageview(path: string): void {
   const provider = import.meta.env.VITE_ANALYTICS_PROVIDER as AnalyticsProvider | undefined;
-  if (provider === 'ga' && (window as any).gtag) {
-    (window as any).gtag('event', 'page_view', { page_path: path });
-  } else if (provider === 'plausible' && (window as any).plausible) {
-    (window as any).plausible('pageview', { u: path });
+  if (provider === 'ga' && window.gtag) {
+    window.gtag('event', 'page_view', { page_path: path });
+  } else if (provider === 'plausible' && window.plausible) {
+    window.plausible('pageview', { u: path });
   }
 }
 
+export function trackEvent(name: string, props?: Record<string, unknown>): void {
+  const provider = import.meta.env.VITE_ANALYTICS_PROVIDER as AnalyticsProvider | undefined;
+  if (provider === 'ga' && window.gtag) {
+    window.gtag('event', name, props || {});
+  } else if (provider === 'plausible' && window.plausible) {
+    window.plausible(name, { props });
+  }
+}
