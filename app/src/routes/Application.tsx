@@ -27,7 +27,19 @@ export default function Application() {
 	const nav = useNavigate();
 
 	const handleSelect = (m: Media) => {
-		setState(s => ({ ...s, media: m }));
+		setState(s => ({
+			...s,
+			media: m,
+			// When switching media, clear dependent tech logic if solids group
+			...(m === 'Sewage' || m === 'WasteWater' || m === 'Solids'
+				? {
+						pipelineContinuous: undefined,
+						pipelineFlat: undefined,
+						tech: undefined,
+						orientation: undefined,
+				  }
+				: {})
+		}));
 		if (m === 'Other') {
 			nav('/contact');
 		} else {

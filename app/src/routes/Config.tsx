@@ -95,12 +95,26 @@ export default function Config() {
 
   const hasSolids = state.media === 'Sewage' || state.media === 'WasteWater' || state.media === 'Solids';
 
-  // Removed 'AirWater' from availability
+  // Updated availableTechs logic for solids media:
+  // If solids: show ONLY ARAA when both pipelineContinuous & pipelineFlat are true, else ONLY EUV.
   const availableTechs: Tech[] = useMemo(() => {
-    if (hasSolids) return ['EUV'];
+    if (hasSolids) {
+      return [(state.pipelineContinuous && state.pipelineFlat) ? 'ARAA' : 'EUV'];
+    }
     if (dutyARAA) return ['ARAA'];
     return ['Hydrochoc', 'Hydrofort', 'Compressor'];
-  }, [hasSolids, dutyARAA]);
+  }, [hasSolids, dutyARAA, state.pipelineContinuous, state.pipelineFlat]);
+
+  // Auto-select enforced tech for solids media (and keep orientation Vertical)
+  useEffect(() => {
+    if (hasSolids) {
+      const target: Tech = (state.pipelineContinuous && state.pipelineFlat) ? 'ARAA' : 'EUV';
+      if (state.tech !== target) {
+        setState(s => ({ ...s, tech: target, orientation: 'Vertical' }));
+        setExpanded(target);
+      }
+    }
+  }, [hasSolids, state.pipelineContinuous, state.pipelineFlat, state.tech, setState]);
 
   const orientationLockedVertical = state.tech === 'EUV' || state.tech === 'ARAA';
   const handleSelectTech = (t: Tech) => {

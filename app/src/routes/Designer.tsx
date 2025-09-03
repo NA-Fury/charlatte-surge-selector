@@ -91,7 +91,8 @@ const PRODUCTS: Record<Tech, ProductMeta> = {
     cons: [
       'Higher capital & maintenance',
       'Air dissolution risk',
-      'Potential long-term corrosion'
+      'Potential long-term corrosion',
+      'Old Technology'
     ],
     icon: Cog,
     pressureNote: LIMITS.Compressor.pressure
@@ -201,10 +202,13 @@ export default function Designer() {
   const { theme } = useTheme();
 
   const hasSolids = state.media === 'Sewage' || state.media === 'WasteWater' || state.media === 'Solids';
-  const showEUV = hasSolids && (state.pipelineContinuous === true || state.pipelineFlat === true);
-  const showARAA = hasSolids && (state.pipelineFlat === true && state.pipelineContinuous === false);
 
-  // Base availability by media/pipeline logic
+  // New solids logic:
+  // ARAA only if BOTH continuous & flat are true; otherwise EUV only.
+  const showARAA = hasSolids && state.pipelineContinuous === true && state.pipelineFlat === true;
+  const showEUV = hasSolids && !showARAA;
+
+  // Base availability (non-solids) unchanged
   const baseTechs: Tech[] = hasSolids ? [] : ['Hydrochoc', 'Hydrofort', 'Compressor'];
   const solidsTechs: Tech[] = [
     ...(showEUV ? (['EUV'] as Tech[]) : []),
